@@ -24,7 +24,7 @@ function getTimestamp(time: string): string {
     time = time.slice(0, 5);
   }
   if (time.includes("pm")) {
-    time = Number(time.slice(0, 2) + 12).toString() + time.slice(2, 5);
+    time = (Number(time.slice(0, 2)) + 12).toString() + time.slice(2, 5);
   }
   const seconds =
     Number(time.slice(0, colonLocation)) * 3600 +
