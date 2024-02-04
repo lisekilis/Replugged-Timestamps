@@ -1,7 +1,8 @@
-import { Injector, common } from "replugged";
+import { Injector, common, Logger } from "replugged";
 
 const { messages } = common;
 const inject = new Injector();
+const logger = Logger.plugin("Replugged-Timestamps");
 
 function getTime(messageContent: string): string | null {
   messageContent = messageContent.toLowerCase();
@@ -24,7 +25,7 @@ function getTimestamp(time: string): string {
     time = time.slice(0, 5);
   }
   if (time.includes("pm")) {
-    time = (Number(time.slice(0, 2)) + 12).toString() + time.slice(2, 5);
+    time = (Number(time.slice(0, 2)) + 12).toString() + time.slice(2, 5); // this is retarded but won't work otherwise
   }
   const seconds =
     Number(time.slice(0, colonLocation)) * 3600 +
@@ -36,13 +37,14 @@ function getTimestamp(time: string): string {
 }
 
 function replaceTimestamp(orgContent: string, orgTime: string): string {
+  const Timestamp = getTimestamp(orgTime); // this must be here or am and pm won't get passed through to getTimestamp
   if (orgTime.includes("am") || orgTime.includes("pm")) {
     orgContent =
       orgContent.slice(0, orgContent.toLowerCase().indexOf(orgTime) + 5) +
       orgContent.slice(orgContent.toLocaleLowerCase().indexOf(orgTime) + orgTime.length);
     orgTime = orgTime.slice(0, 5);
   }
-  const newContent = `${orgContent.slice(0, orgContent.indexOf(orgTime))}${getTimestamp(orgTime)}${orgContent.slice(orgContent.indexOf(orgTime) + orgTime.length)}`;
+  const newContent = `${orgContent.slice(0, orgContent.indexOf(orgTime))}${Timestamp}${orgContent.slice(orgContent.indexOf(orgTime) + orgTime.length)}`;
   const newTime = getTime(newContent);
   if (newTime != null) {
     return replaceTimestamp(newContent, newTime);
