@@ -4,13 +4,28 @@ const { messages } = common;
 const inject = new Injector();
 
 function getTime(messageContent: string): string | null {
-  const time = messageContent.match(/([0-1][0-9]|2[0-3]):([0-5][0-9])|24:00/);
-  return time ? time[0] : null;
+  messageContent = messageContent.toLowerCase();
+  const worseTimeMatch = messageContent.match(
+    /((0[1-9]|1[0-2]):[0-5][0-9] ?am)|((0[0-9]:[0-5][0-9]|1[0-1]:[0-5][0-9]|12:00) ?pm)/,
+  );
+  if (worseTimeMatch != null) {
+    return worseTimeMatch ? worseTimeMatch[0] : null;
+  } else {
+    const betterTimeMatch = messageContent.match(/([0-1][0-9]|2[0-3]):([0-5][0-9])|24:00/);
+    return betterTimeMatch ? betterTimeMatch[0] : null;
+  }
 }
 function getTimestamp(time: string): string {
   const colonLocation = time.indexOf(":");
   const currentDayTimestamp = Math.floor(Date.now() / 86400000) * 86400;
   const timezoneOffset = new Date().getTimezoneOffset();
+
+  if (time.includes("am")) {
+    time = time.slice(0, 5);
+  }
+  if (time.includes("pm")) {
+    time = Number(time.slice(0, 2) + 12).toString() + time.slice(2, 5);
+  }
   const seconds =
     Number(time.slice(0, colonLocation)) * 3600 +
     Number(time.slice(colonLocation + 1)) * 60 +
@@ -21,6 +36,12 @@ function getTimestamp(time: string): string {
 }
 
 function replaceTimestamp(orgContent: string, orgTime: string): string {
+  if (orgTime.includes("am") || orgTime.includes("pm")) {
+    orgContent =
+      orgContent.slice(0, orgContent.toLowerCase().indexOf(orgTime) + 5) +
+      orgContent.slice(orgContent.toLocaleLowerCase().indexOf(orgTime) + orgTime.length);
+    orgTime = orgTime.slice(0, 5);
+  }
   const newContent = `${orgContent.slice(0, orgContent.indexOf(orgTime))}${getTimestamp(orgTime)}${orgContent.slice(orgContent.indexOf(orgTime) + orgTime.length)}`;
   const newTime = getTime(newContent);
   if (newTime != null) {
