@@ -1,7 +1,7 @@
 {
-  "name": "plugin-template",
+  "name": "Replugged-Timestamps",
   "version": "1.0.0",
-  "description": "A plugin template",
+  "description": "A plugin that replaces hours with acutal timestamps in your messages",
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=8.0.0"
