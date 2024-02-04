@@ -1,8 +1,7 @@
-import { Injector, common, Logger } from "replugged";
+import { Injector, common } from "replugged";
 
 const { messages } = common;
 const inject = new Injector();
-const logger = Logger.plugin("Replugged-Timestamps");
 
 function getTime(messageContent: string): string | null {
   messageContent = messageContent.toLowerCase();
