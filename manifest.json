@@ -1,5 +1,5 @@
 {
-  "id": "dev.replugged.PluginTemplate",
+  "id": "dev.lisekilis.RepluggedTimestamps",
   "name": "Replugged-Timestamps",
   "description": "A plugin that replaces hours with acutal timestamps in your messages",
   "author": {
@@ -10,7 +10,7 @@
   "version": "1.0.0",
   "updater": {
     "type": "store",
-    "id": "dev.lisekilis.RepluggedEdited"
+    "id": "dev.lisekilis.RepluggedTimestamps"
   },
   "license": "MIT",
   "type": "replugged-plugin",
