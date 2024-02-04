@@ -9,7 +9,7 @@ function getTime(messageContent: string): string | null {
     /((0[1-9]|1[0-2]):[0-5][0-9] ?am)|((0[0-9]:[0-5][0-9]|1[0-1]:[0-5][0-9]|12:00) ?pm)/,
   );
   if (worseTimeMatch != null) {
-    return worseTimeMatch ? worseTimeMatch[0] : null;
+    return worseTimeMatch[0];
   } else {
     const betterTimeMatch = messageContent.match(/([0-1][0-9]|2[0-3]):([0-5][0-9])|24:00/);
     return betterTimeMatch ? betterTimeMatch[0] : null;
