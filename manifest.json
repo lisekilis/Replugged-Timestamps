@@ -1,7 +1,7 @@
 {
   "id": "dev.lisekilis.RepluggedTimestamps",
   "name": "Replugged-Timestamps",
-  "description": "A plugin that replaces hours with acutal timestamps in your messages",
+  "description": "A plugin that replaces hours with actual timestamps in your messages",
   "author": {
     "name": "lisekilis",
     "discordID": "396990201790201857",
