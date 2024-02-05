@@ -1,4 +1,4 @@
-# Replugged-Edited
+# Replugged-Timestamps
 
 A plugin that replaces hours with acutal timestamps in your messages
 
