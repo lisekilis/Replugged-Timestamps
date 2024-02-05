@@ -1,6 +1,6 @@
 # Replugged-Timestamps
 
-A plugin that replaces hours with acutal timestamps in your messages
+A plugin that replaces hours with actual timestamps in your messages
 
 All you have to do to use this plugin is place time formated like this: hh:mm (works with 12h an 24h time system)
 
