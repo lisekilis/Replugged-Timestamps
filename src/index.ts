@@ -1,4 +1,7 @@
 import { Injector, common } from "replugged";
+import { cfg } from "./config";
+
+export * from "./settings";
 
 const { messages } = common;
 const inject = new Injector();
