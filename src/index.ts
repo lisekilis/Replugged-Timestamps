@@ -1,4 +1,4 @@
-import { Injector, common } from "replugged";
+import { Injector, common, Logger } from "replugged";
 import { cfg } from "./config";
 
 export * from "./settings";
@@ -6,12 +6,18 @@ export * from "./settings";
 const { messages } = common;
 const inject = new Injector();
 const prefixRequired = cfg.get("prefix", false);
+const logger = Logger.plugin("Replugged-Timestamps");
 
 function findPrefix(messageContent: string): { prefix: string | null; location: number | null } {
-  const prefixes = /ggfd0/;
-  const prefix = messageContent.match(prefixes)![0].slice(0, 1);
-  const location = messageContent.search(prefixes);
-  return { prefix, location };
+  const prefixes = /(d-|D-|t-|T-|f-|F-|R-)(([0-1][0-9]|2[0-3]):([0-5][0-9])|24:00)/;
+  const match = messageContent.match(prefixes);
+
+  if (match != null) {
+    const prefix: string | null = match[0].slice(0, 1);
+    const location = messageContent.search(prefixes);
+    return { prefix, location };
+  }
+  return { prefix: null, location: null };
 }
 function getTime(messageContent: string, location?: number | null): string | null {
   messageContent = messageContent.toLowerCase();
@@ -27,7 +33,7 @@ function getTime(messageContent: string, location?: number | null): string | nul
   const betterTimeMatch = messageContent.match(/([0-1][0-9]|2[0-3]):([0-5][0-9])|24:00/);
   return betterTimeMatch ? betterTimeMatch[0] : null;
 }
-function getTimestamp(time: string, prefix?: string): string {
+function getTimestamp(time: string, prefix?: string | null): string {
   const colonLocation = time.indexOf(":");
   const currentDayTimestamp = Math.floor(Date.now() / 86400000) * 86400;
   const timezoneOffset = new Date().getTimezoneOffset();
@@ -49,18 +55,19 @@ function getTimestamp(time: string, prefix?: string): string {
   return timestamp;
 }
 
-function replaceTimestamp(orgContent: string, orgTime: string, orgPrefix?: string): string {
-  const Timestamp = getTimestamp(orgTime); // this must be here or am and pm won't get passed through to getTimestamp
+function replaceTimestamp(orgContent: string, orgTime: string, orgPrefix?: string | null): string {
+  const Timestamp = getTimestamp(orgTime, orgPrefix); // this must be here or am and pm won't get passed through to getTimestamp
   if (orgTime.includes("am") || orgTime.includes("pm")) {
     orgContent =
       orgContent.slice(0, orgContent.toLowerCase().indexOf(orgTime) + 5) +
       orgContent.slice(orgContent.toLocaleLowerCase().indexOf(orgTime) + orgTime.length);
     orgTime = orgTime.slice(0, 5);
   }
-  if (orgPrefix) {
+  if (orgPrefix != null) {
+    logger.log(`index:${orgContent.indexOf(orgTime)}`);
     orgContent =
       orgContent.slice(0, orgContent.indexOf(orgTime) - 2) +
-      orgContent.slice(orgContent.indexOf(orgTime) + orgTime.length);
+      orgContent.slice(orgContent.indexOf(orgTime));
   }
   const newContent = `${orgContent.slice(0, orgContent.indexOf(orgTime))}${Timestamp}${orgContent.slice(orgContent.indexOf(orgTime) + orgTime.length)}`;
   const newPrefix = findPrefix(newContent);
@@ -85,9 +92,8 @@ export async function start(): Promise<void> {
         ? getTime(orgContent, prefix.location + 2)
         : null
       : getTime(orgContent, prefix.location ? prefix.location + 2 : null);
-
     if (time != null) {
-      const newContent = replaceTimestamp(orgContent, time[0]);
+      const newContent = replaceTimestamp(orgContent, time, prefix.prefix);
       _args[1].content = newContent;
     }
 
