@@ -1,4 +1,4 @@
-import { Injector, common, Logger } from "replugged";
+import { Injector, common } from "replugged";
 import { cfg } from "./config";
 
 export * from "./settings";
@@ -6,7 +6,6 @@ export * from "./settings";
 const { messages } = common;
 const inject = new Injector();
 const prefixRequired = cfg.get("prefix", false);
-const logger = Logger.plugin("Replugged-Timestamps");
 
 function findPrefix(messageContent: string): { prefix: string | null; location: number | null } {
   const prefixes = /(d-|D-|t-|T-|f-|F-|R-)(([0-1][0-9]|2[0-3]):([0-5][0-9])|24:00)/;
@@ -64,7 +63,6 @@ function replaceTimestamp(orgContent: string, orgTime: string, orgPrefix?: strin
     orgTime = orgTime.slice(0, 5);
   }
   if (orgPrefix != null) {
-    logger.log(`index:${orgContent.indexOf(orgTime)}`);
     orgContent =
       orgContent.slice(0, orgContent.indexOf(orgTime) - 2) +
       orgContent.slice(orgContent.indexOf(orgTime));
