@@ -7,7 +7,6 @@ const { messages } = common;
 const inject = new Injector();
 const logger = Logger.plugin("Replugged-Timestamps");
 const prefixRequired = cfg.get("prefix", true);
-const shortYear = cfg.get("shortYear", false);
 
 interface FindResult {
   prefix: string | null;
@@ -33,9 +32,66 @@ function findDateTime(messageContent: string): FindResult | null {
     index = match.index;
     messageContent = messageContent.slice(index + 2);
   }
-  logger.log(`prefix: ${prefix}`, `index: ${index}`, `totalLength: ${totalLength}`);
-
-  let dateMatch = /([0-2]?[0-9]|3[0-1])\.(1[0-2]|0?[0-9])\.(\d+)\b\s*/.exec(messageContent);
+  const format = cfg.get("format", "dmy");
+  logger.log(
+    `prefix: ${prefix}`,
+    `index: ${index}`,
+    `totalLength: ${totalLength}`,
+    `format: ${format}`,
+  );
+  let dateMatch = null;
+  switch (format) {
+    case "dmy":
+      dateMatch = /([0-2]?[0-9]|3[0-1])\.(1[0-2]|0?[0-9])\.(\d+)\b\s*/.exec(messageContent);
+      if (dateMatch) {
+        dateMatch = {
+          length: dateMatch[0].length,
+          day: dateMatch[1],
+          month: dateMatch[2],
+          year: dateMatch[3],
+          index: dateMatch.index,
+        };
+      }
+      break;
+    case "mdy":
+      dateMatch = /(1[0-2]|0?[0-9])\.([0-2]?[0-9]|3[0-1])\.(\d+)\b\s*/.exec(messageContent);
+      if (dateMatch) {
+        dateMatch = {
+          length: dateMatch[0].length,
+          day: dateMatch[2],
+          month: dateMatch[1],
+          year: dateMatch[3],
+          index: dateMatch.index,
+        };
+      }
+      break;
+    case "ymd":
+      dateMatch = /(\d+)\.(1[0-2]|0?[0-9])\.([0-2]?[0-9]|3[0-1])\b\s*/.exec(messageContent);
+      if (dateMatch) {
+        dateMatch = {
+          length: dateMatch[0].length,
+          day: dateMatch[3],
+          month: dateMatch[2],
+          year: dateMatch[1],
+          index: dateMatch.index,
+        };
+      }
+      break;
+    case "ydm":
+      dateMatch = /(\d+)\.([0-2]?[0-9]|3[0-1])\.(1[0-2]|0?[0-9])\b\s*/.exec(messageContent);
+      if (dateMatch) {
+        dateMatch = {
+          length: dateMatch[0].length,
+          day: dateMatch[2],
+          month: dateMatch[3],
+          year: dateMatch[1],
+          index: dateMatch.index,
+        };
+      }
+      break;
+    default:
+      break;
+  }
   let date = null;
   if (dateMatch != null) {
     if (index == null) index = dateMatch.index;
@@ -43,14 +99,14 @@ function findDateTime(messageContent: string): FindResult | null {
   }
   logger.log(`dateMatch: ${dateMatch}`);
   if (dateMatch != null) {
-    let year = Number(dateMatch[3]);
-    if (dateMatch[3].length === 2 && shortYear) {
+    let year = Number(dateMatch.year);
+    if (dateMatch.year.length === 2 && cfg.get("shortYear", false)) {
       const currentYear = new Date().getFullYear();
       year += currentYear - (currentYear % 100);
     }
-    date = [Number(dateMatch[1]), Number(dateMatch[2]) - 1, year];
-    messageContent = messageContent.slice(dateMatch.index + dateMatch[0].length);
-    totalLength += dateMatch[0].length;
+    date = [Number(dateMatch.day), Number(dateMatch.month) - 1, year];
+    messageContent = messageContent.slice(dateMatch.index + dateMatch.length);
+    totalLength += dateMatch.length;
   }
   let shortTimeMatch = /(0?[1-9]|1[0-2]):([0-5]?[0-9])\s*(am|pm)/i.exec(messageContent);
   let time;
