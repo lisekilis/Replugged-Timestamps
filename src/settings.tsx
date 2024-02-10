@@ -1,6 +1,6 @@
 import { components, settings, util } from "replugged";
 
-const { Clickable, Category, Divider, Flex, SwitchItem, Text, Tooltip } = components;
+const { Clickable, Category, Divider, SwitchItem, Text } = components;
 
 const cfg = await settings.init("dev.lisekilis.RepluggedTimestamps");
 
@@ -13,7 +13,7 @@ export function Settings(): React.ReactElement {
         }}>
         Required Prefix
       </SwitchItem>
-      <Category title="Formating">
+      <Category title="Formatting">
         <Text.H2 markdown>{"t-hh:mm <t:1692525600:t>"}</Text.H2>
         <Divider />
         <Text.H2 markdown>{"T-hh:mm:ss <t:1692525600:T>"}</Text.H2>
