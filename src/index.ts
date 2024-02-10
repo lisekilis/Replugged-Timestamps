@@ -1,20 +1,20 @@
-import { Injector, common, Logger } from "replugged";
+import { Injector, Logger, common } from "replugged";
 import { cfg } from "./config";
 
 export * from "./settings";
 
 const { messages } = common;
 const inject = new Injector();
+const logger = Logger.plugin("Replugged-Timestamps");
 const prefixRequired = cfg.get("prefix", true);
 const shortYear = cfg.get("shortYear", false);
-const logger = Logger.plugin("Replugged-Timestamps");
 
-type FindResult = {
+interface FindResult {
   prefix: string | null;
   date: Date;
   index: number;
   length: number;
-};
+}
 
 function findDateTime(messageContent: string): FindResult | null {
   let totalLength = 0;
@@ -89,14 +89,12 @@ function findDateTime(messageContent: string): FindResult | null {
         date.setHours(time[0]);
         date.setMinutes(time[1]);
         date.setSeconds(0);
-        /*if (date.getTime() <= Date.now()) {
-          date.setDate(date.getDate() + 1);
-        }*/
         return date;
       })();
   return {
     prefix,
     date: fullDate,
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     index: index!,
     length: totalLength,
   };
@@ -127,7 +125,13 @@ export async function start(): Promise<void> {
   inject.before(messages, "sendMessage", (_args) => {
     const orgContent = _args[1].content;
     const newContent = replaceTimestamp(orgContent);
-    if (newContent != null) _args[1].content = newContent;
+    if (newContent) _args[1].content = newContent;
+    return _args;
+  });
+  inject.before(messages, "editMessage", (_args) => {
+    const orgContent = _args[2].content;
+    const newContent = replaceTimestamp(orgContent);
+    if (newContent) _args[2].content = newContent;
     return _args;
   });
 }
