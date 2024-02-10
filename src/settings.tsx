@@ -7,7 +7,7 @@ export function Settings(): React.ReactElement {
   return (
     <>
       <SwitchItem {...util.useSetting(cfg, "prefix", true)}>Required Prefix</SwitchItem>
-      <Category title="Formating">
+      <Category title="Formatting">
         <table border={1}>
           <tr>
             <td>
