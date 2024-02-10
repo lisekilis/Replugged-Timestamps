@@ -1,7 +1,6 @@
 import { components, settings, util } from "replugged";
 
 const { Clickable, Category, Divider, Flex, SwitchItem, SelectItem, Text, Tooltip } = components;
-
 const cfg = await settings.init("dev.lisekilis.RepluggedTimestamps");
 //TO DO: make the formating table look cool using flex
 export function Settings(): React.ReactElement {
@@ -75,7 +74,7 @@ export function Settings(): React.ReactElement {
         </table>
       </Category>
       <Category title="Date Format">
-        <SelectItem
+        <SelectItem //TODO: add a sound for when mdy or ydm is selected
           {...util.useSetting(cfg, "format", "dmy")}
           options={[
             {
