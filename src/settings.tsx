@@ -114,9 +114,17 @@ export function Settings(): React.ReactElement {
               <Text.H2 markdown>{"<t:1692525600:R>"}</Text.H2>
             </td>
           </tr>
+          <Divider />
+          <tr>
+            <td>
+              <Text.H2 markdown>{"F-10.10.2007 4:20"}</Text.H2>
+            </td>
+            <td>
+              <Text.H2 markdown>{"<t:1191982800:F>"}</Text.H2>
+            </td>
+          </tr>
         </table>
       </Category>
-      <Tooltip children={<Text.H1>hi</Text.H1>} text={"hi"}></Tooltip>
       <Category title="Date Format">
         <SelectItem //TODO: add a sound for when mdy or ydm is selected
           {...dateFormatProps}
