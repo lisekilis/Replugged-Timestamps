@@ -6,7 +6,6 @@ export * from "./settings";
 const { messages } = common;
 const inject = new Injector();
 //const logger = Logger.plugin("Replugged-Timestamps");
-const prefixRequired = cfg.get("prefix", true);
 
 interface FindResult {
   prefix: string | null;
@@ -17,7 +16,7 @@ interface FindResult {
 
 function findDateTime(messageContent: string): FindResult | null {
   let totalLength = 0;
-
+  const prefixRequired = cfg.get("prefix", true);
   //const prefixes = /(d-|D-|t-|T-|f-|F-|R-)([/w]{*})?(([0-1][0-9]|2[0-3]):([0-5][0-9])|24:00)/;
   const prefixes = /(d|D|t|T|f|F|R)-/;
   const match = prefixes.exec(messageContent);
