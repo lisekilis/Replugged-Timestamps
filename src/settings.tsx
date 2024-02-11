@@ -6,24 +6,26 @@ const boom = new Audio(
 );
 const cfg = await settings.init("dev.lisekilis.RepluggedTimestamps");
 // function for making a table
-// export function FormatRow({
-//   display,
-//   example,
-// }: {
-//   display: string;
-//   example: string;
-// }): React.ReactElement {
-//   return (
-//     <Flex>
-//       <Flex.Child grow={2} shrink={0}>
-//         <Text.H2>{display}</Text.H2>
-//       </Flex.Child>
-//       <Flex.Child grow={3} shrink={0}>
-//         <Text.H2 markdown>{example}</Text.H2>
-//       </Flex.Child>
-//     </Flex>
-//   );
-// }
+/*
+export function FormatRow({
+  display,
+  example,
+}: {
+  display: string;
+  example: string;
+}): React.ReactElement {
+  return (
+    <Flex>
+      <Flex.Child grow={2} shrink={0}>
+        <Text.H2>{display}</Text.H2>
+      </Flex.Child>
+      <Flex.Child grow={3} shrink={0}>
+        <Text.H2 markdown>{example}</Text.H2>
+      </Flex.Child>
+    </Flex>
+  );
+}
+*/
 export function Settings(): React.ReactElement {
   const dateFormatProps = util.useSetting(cfg, "format", "dmy");
   dateFormatProps.onChange = ((passOn: (value: string) => void, value: string): void => {
