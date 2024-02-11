@@ -1,9 +1,6 @@
 import { components, settings, util } from "replugged";
 
 const { Clickable, Category, Divider, Flex, SwitchItem, SelectItem, Text, Tooltip } = components;
-const boom = new Audio(
-  "https://raw.githubusercontent.com/lisekilis/Replugged-Timestamps/main/audio/vineBoom.wav",
-);
 const cfg = await settings.init("dev.lisekilis.RepluggedTimestamps");
 // function for making a table
 /*
@@ -26,14 +23,15 @@ export function FormatRow({
   );
 }
 */
+
 export function Settings(): React.ReactElement {
   const dateFormatProps = util.useSetting(cfg, "format", "dmy");
-  dateFormatProps.onChange = ((passOn: (value: string) => void, value: string): void => {
-    if (value === "ydm" || value === "mdy") {
-      void boom.play();
-    }
-    passOn(value);
-  }).bind(null, dateFormatProps.onChange);
+  // dateFormatProps.onChange = ((passOn: (value: string) => void, value: string): void => {
+  //   if (value === "ydm" || value === "mdy") {
+  //     void boom.play();
+  //   }
+  //   passOn(value);
+  // }).bind(null, dateFormatProps.onChange);
   /*
     <FormatRow display={"t-hh:mm"} example={"<t:1692525600:t>"} />
     <Divider />
