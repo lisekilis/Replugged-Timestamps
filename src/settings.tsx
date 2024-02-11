@@ -1,9 +1,52 @@
 import { components, settings, util } from "replugged";
 
 const { Clickable, Category, Divider, Flex, SwitchItem, SelectItem, Text, Tooltip } = components;
+const boom = new Audio(
+  "https://raw.githubusercontent.com/lisekilis/Replugged-Timestamps/main/audio/vineBoom.wav",
+);
 const cfg = await settings.init("dev.lisekilis.RepluggedTimestamps");
-//TO DO: make the formating table look cool using flex
+// function for making a table
+// export function FormatRow({
+//   display,
+//   example,
+// }: {
+//   display: string;
+//   example: string;
+// }): React.ReactElement {
+//   return (
+//     <Flex>
+//       <Flex.Child grow={2} shrink={0}>
+//         <Text.H2>{display}</Text.H2>
+//       </Flex.Child>
+//       <Flex.Child grow={3} shrink={0}>
+//         <Text.H2 markdown>{example}</Text.H2>
+//       </Flex.Child>
+//     </Flex>
+//   );
+// }
 export function Settings(): React.ReactElement {
+  const dateFormatProps = util.useSetting(cfg, "format", "dmy");
+  dateFormatProps.onChange = ((passOn: (value: string) => void, value: string): void => {
+    if (value === "ydm" || value === "mdy") {
+      void boom.play();
+    }
+    passOn(value);
+  }).bind(null, dateFormatProps.onChange);
+  /*
+    <FormatRow display={"t-hh:mm"} example={"<t:1692525600:t>"} />
+    <Divider />
+    <FormatRow display={"T-hh:mm:s"} example={"<t:1692525600:T>"} />
+    <Divider />
+    <FormatRow display={"d-hh:mm"} example={"<t:1692525600:d>"} />
+    <Divider />
+    <FormatRow display={"D-hh:mm"} example={"<t:1692525600:D>"} />
+    <Divider />
+    <FormatRow display={"f-hh:mm"} example={"<t:1692525600:f>"} />
+    <Divider />
+    <FormatRow display={"F-hh:mm"} example={"<t:1692525600:F>"} />
+    <Divider />
+    <FormatRow display={"R-hh:mm"} example={"<t:1692525600:R>"} />
+  */
   return (
     <>
       <SwitchItem {...util.useSetting(cfg, "prefix", true)}>Required Prefix</SwitchItem>
@@ -73,9 +116,10 @@ export function Settings(): React.ReactElement {
           </tr>
         </table>
       </Category>
+      <Tooltip children={<Text.H1>hi</Text.H1>} text={"hi"}></Tooltip>
       <Category title="Date Format">
         <SelectItem //TODO: add a sound for when mdy or ydm is selected
-          {...util.useSetting(cfg, "format", "dmy")}
+          {...dateFormatProps}
           options={[
             {
               label: "DD/MM/YYYY",
