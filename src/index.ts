@@ -1,11 +1,11 @@
-import { Injector, Logger, common } from "replugged";
+import { Injector, common } from "replugged";
 import { cfg } from "./config";
 
 export * from "./settings";
 
 const { messages } = common;
 const inject = new Injector();
-const logger = Logger.plugin("Replugged-Timestamps");
+//const logger = Logger.plugin("Replugged-Timestamps");
 const prefixRequired = cfg.get("prefix", true);
 
 interface FindResult {
@@ -33,12 +33,6 @@ function findDateTime(messageContent: string): FindResult | null {
     messageContent = messageContent.slice(index + 2);
   }
   const format = cfg.get("format", "dmy");
-  logger.log(
-    `prefix: ${prefix}`,
-    `index: ${index}`,
-    `totalLength: ${totalLength}`,
-    `format: ${format}`,
-  );
   let dateMatch = null;
   switch (format) {
     case "dmy":
@@ -97,7 +91,7 @@ function findDateTime(messageContent: string): FindResult | null {
     if (index == null) index = dateMatch.index;
     else if (dateMatch.index !== 0) dateMatch = null;
   }
-  logger.log(`dateMatch: ${dateMatch}`);
+
   if (dateMatch != null) {
     let year = Number(dateMatch.year);
     if (dateMatch.year.length === 2 && cfg.get("shortYear", false)) {
@@ -117,18 +111,17 @@ function findDateTime(messageContent: string): FindResult | null {
   if (shortTimeMatch != null) {
     totalLength += shortTimeMatch[0].length;
     let hour = Number(shortTimeMatch[1]);
-    if (hour === 12) hour = 0;
     if (shortTimeMatch[3].toLowerCase() == "pm") {
       hour += 12;
     }
-    time = [hour, Number(shortTimeMatch)];
+    time = [hour, Number(shortTimeMatch[2])];
   } else {
     let longTimeMatch = /([0-1]?[0-9]|2[0-3]):([0-5]?[0-9])|24:00/.exec(messageContent);
     if (longTimeMatch != null) {
       if (index == null) index = longTimeMatch.index;
       else if (longTimeMatch.index !== 0) longTimeMatch = null;
     }
-    logger.log(`index: ${index}`, `totalLength: ${totalLength}`);
+
     if (!longTimeMatch) return null;
     totalLength += longTimeMatch[0].length;
     if (longTimeMatch[0] === "24:00") {
@@ -137,7 +130,7 @@ function findDateTime(messageContent: string): FindResult | null {
       time = [Number(longTimeMatch[1]), Number(longTimeMatch[2])];
     }
   }
-  logger.log(`index: ${index}`, `totalLength: ${totalLength}`, `date: ${date}`);
+
   const fullDate = date
     ? new Date(date[2], date[1], date[0], time[0], time[1])
     : (() => {
