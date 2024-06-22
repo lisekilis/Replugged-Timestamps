@@ -18,7 +18,7 @@ function findDateTime(messageContent: string): FindResult | null {
   let totalLength = 0;
   const prefixRequired = cfg.get("prefix", true);
   //const prefixes = /(d-|D-|t-|T-|f-|F-|R-)([/w]{*})?(([0-1][0-9]|2[0-3]):([0-5][0-9])|24:00)/;
-  const prefixes = /(d|D|t|T|f|F|R)-/;
+  const prefixes = /(?<!\S)(d|D|t|T|f|F|R)-/;
   const match = prefixes.exec(messageContent);
   let prefix,
     index = null;
@@ -26,7 +26,7 @@ function findDateTime(messageContent: string): FindResult | null {
     if (prefixRequired) return null;
     prefix = null;
   } else {
-    prefix = match[1];
+    prefix = match[2];
     totalLength += 2;
     index = match.index;
     messageContent = messageContent.slice(index + 2);
@@ -109,7 +109,7 @@ function findDateTime(messageContent: string): FindResult | null {
     messageContent = messageContent.slice(dateMatch.index + dateMatch.length);
     totalLength += dateMatch.length;
   }
-  let shortTimeMatch = /(0?[1-9]|1[0-2]):([0-5]?[0-9])\s*(am|pm)/i.exec(messageContent);
+  let shortTimeMatch = /(?<!\S)(0?[1-9]|1[0-2]):([0-5]?[0-9])\s*(am|pm)/i.exec(messageContent);
   let time;
   if (shortTimeMatch != null) {
     if (index == null) index = shortTimeMatch.index;
@@ -117,19 +117,19 @@ function findDateTime(messageContent: string): FindResult | null {
   }
   if (shortTimeMatch != null) {
     totalLength += shortTimeMatch[0].length;
-    let hour = Number(shortTimeMatch[1]);
-    if (shortTimeMatch[3].toLowerCase() == "pm") {
-      if (shortTimeMatch[1].toLowerCase() != "12") hour += 12;
+    let hour = Number(shortTimeMatch[2]);
+    if (shortTimeMatch[4].toLowerCase() == "pm") {
+      if (shortTimeMatch[2].toLowerCase() != "12") hour += 12;
     }
     if (
-      shortTimeMatch[1] == "12" &&
-      shortTimeMatch[2] == "00" &&
-      shortTimeMatch[3].toLowerCase() == "am"
+      shortTimeMatch[2] == "12" &&
+      shortTimeMatch[3] == "00" &&
+      shortTimeMatch[4].toLowerCase() == "am"
     )
       hour = 0;
     time = [hour, Number(shortTimeMatch[2])];
   } else {
-    let longTimeMatch = /([0-1]?[0-9]|2[0-3]):([0-5]?[0-9])|24:00/.exec(messageContent);
+    let longTimeMatch = /(?<!\S)([0-1]?[0-9]|2[0-3]):([0-5]?[0-9])|24:00/.exec(messageContent);
     if (longTimeMatch != null) {
       if (index == null) index = longTimeMatch.index;
       else if (longTimeMatch.index !== 0) longTimeMatch = null;
@@ -138,7 +138,7 @@ function findDateTime(messageContent: string): FindResult | null {
     if (!longTimeMatch) return null;
     totalLength += longTimeMatch[0].length;
     if (longTimeMatch[0] == "24:00") time = [24, 0];
-    else time = [Number(longTimeMatch[1]), Number(longTimeMatch[2])];
+    else time = [Number(longTimeMatch[2]), Number(longTimeMatch[3])];
   }
 
   const fullDate = date
