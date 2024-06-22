@@ -35,7 +35,9 @@ function findDateTime(messageContent: string): FindResult | null {
   let dateMatch = null;
   switch (format) {
     case "dmy":
-      dateMatch = /([0-2]?[0-9]|3[0-1])\.(1[0-2]|0?[0-9])\.(\d+)\b\s*/.exec(messageContent);
+      dateMatch = /([0-2]?[0-9]|3[0-1])[\.\\\-\_](1[0-2]|0?[0-9])[\.\\\-\_](\d+)\b\s*/.exec(
+        messageContent,
+      );
       if (dateMatch) {
         dateMatch = {
           length: dateMatch[0].length,
@@ -47,7 +49,9 @@ function findDateTime(messageContent: string): FindResult | null {
       }
       break;
     case "mdy":
-      dateMatch = /(1[0-2]|0?[0-9])\.([0-2]?[0-9]|3[0-1])\.(\d+)\b\s*/.exec(messageContent);
+      dateMatch = /(1[0-2]|0?[0-9])[\.\\\-\_]([0-2]?[0-9]|3[0-1])[\.\\\-\_](\d+)\b\s*/.exec(
+        messageContent,
+      );
       if (dateMatch) {
         dateMatch = {
           length: dateMatch[0].length,
@@ -59,7 +63,9 @@ function findDateTime(messageContent: string): FindResult | null {
       }
       break;
     case "ymd":
-      dateMatch = /(\d+)\.(1[0-2]|0?[0-9])\.([0-2]?[0-9]|3[0-1])\b\s*/.exec(messageContent);
+      dateMatch = /(\d+)[\.\\\-\_](1[0-2]|0?[0-9])[\.\\\-\_]([0-2]?[0-9]|3[0-1])\b\s*/.exec(
+        messageContent,
+      );
       if (dateMatch) {
         dateMatch = {
           length: dateMatch[0].length,
@@ -71,7 +77,9 @@ function findDateTime(messageContent: string): FindResult | null {
       }
       break;
     case "ydm":
-      dateMatch = /(\d+)\.([0-2]?[0-9]|3[0-1])\.(1[0-2]|0?[0-9])\b\s*/.exec(messageContent);
+      dateMatch = /(\d+)[\.\\\-\_]([0-2]?[0-9]|3[0-1])[\.\\\-\_](1[0-2]|0?[0-9])\b\s*/.exec(
+        messageContent,
+      );
       if (dateMatch) {
         dateMatch = {
           length: dateMatch[0].length,
@@ -93,7 +101,7 @@ function findDateTime(messageContent: string): FindResult | null {
 
   if (dateMatch != null) {
     let year = Number(dateMatch.year);
-    if (dateMatch.year.length === 2 && cfg.get("shortYear", false)) {
+    if (dateMatch.year.length === 2 && cfg.get("shortYear", true)) {
       const currentYear = new Date().getFullYear();
       year += currentYear - (currentYear % 100);
     }

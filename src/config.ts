@@ -9,7 +9,7 @@ interface Settings {
 const defaultSettings = {
   prefix: true,
   format: "dmy",
-  shortYear: false,
+  shortYear: true,
 } satisfies Partial<Settings>;
 
 export const cfg = await settings.init<Settings, keyof typeof defaultSettings>(
