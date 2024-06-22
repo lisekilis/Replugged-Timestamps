@@ -1,11 +1,11 @@
-import { Injector, common } from "replugged";
+import { Injector, Logger, common } from "replugged";
 import { cfg } from "./config";
 
 export * from "./settings";
 
 const { messages } = common;
 const inject = new Injector();
-//const logger = Logger.plugin("Replugged-Timestamps");
+const logger = Logger.plugin("Replugged-Timestamps");
 
 interface FindResult {
   prefix: string | null;
@@ -111,8 +111,14 @@ function findDateTime(messageContent: string): FindResult | null {
     totalLength += shortTimeMatch[0].length;
     let hour = Number(shortTimeMatch[1]);
     if (shortTimeMatch[3].toLowerCase() == "pm") {
-      hour += 12;
+      if (shortTimeMatch[1].toLowerCase() != "12") hour += 12;
     }
+    if (
+      shortTimeMatch[1] == "12" &&
+      shortTimeMatch[2] == "00" &&
+      shortTimeMatch[3].toLowerCase() == "am"
+    )
+      hour = 0;
     time = [hour, Number(shortTimeMatch[2])];
   } else {
     let longTimeMatch = /([0-1]?[0-9]|2[0-3]):([0-5]?[0-9])|24:00/.exec(messageContent);
@@ -123,11 +129,8 @@ function findDateTime(messageContent: string): FindResult | null {
 
     if (!longTimeMatch) return null;
     totalLength += longTimeMatch[0].length;
-    if (longTimeMatch[0] === "24:00") {
-      time = [0, 0];
-    } else {
-      time = [Number(longTimeMatch[1]), Number(longTimeMatch[2])];
-    }
+    if (longTimeMatch[0] == "24:00") time = [24, 0];
+    else time = [Number(longTimeMatch[1]), Number(longTimeMatch[2])];
   }
 
   const fullDate = date
@@ -155,31 +158,20 @@ function getTimestamp(date: Date, prefix?: string | null): string {
   return discordTimestamp;
 }
 
-function replaceTimestamp(content: string): string | null {
-  let first = true;
-  while (true) {
-    const time = findDateTime(content);
-    if (!time) {
-      if (first) return null;
-      return content;
-    }
-    first = false;
-    const timestamp = getTimestamp(time.date, time.prefix);
-    content = content.slice(0, time.index) + timestamp + content.slice(time.index + time.length);
-  }
+function replaceTimestamp(content: string): string {
+  const time = findDateTime(content);
+  if (time)
+    return `${content[time.index - 1] == "\\" ? content.slice(0, time.index - 1) : content.slice(0, time.index)}${content[time.index - 1] == "\\" ? content.slice(time.index, time.index + time.length) : getTimestamp(time.date, time.prefix)}${replaceTimestamp(content.slice(time.index + time.length, content.length))}`;
+  else return content;
 }
 // eslint-disable-next-line @typescript-eslint/require-await
 export async function start(): Promise<void> {
   inject.before(messages, "sendMessage", (_args) => {
-    const orgContent = _args[1].content;
-    const newContent = replaceTimestamp(orgContent);
-    if (newContent) _args[1].content = newContent;
+    _args[1].content = replaceTimestamp(_args[1].content);
     return _args;
   });
   inject.before(messages, "editMessage", (_args) => {
-    const orgContent = _args[2].content;
-    const newContent = replaceTimestamp(orgContent);
-    if (newContent) _args[2].content = newContent;
+    _args[2].content = replaceTimestamp(_args[2].content);
     return _args;
   });
 }
