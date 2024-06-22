@@ -35,7 +35,7 @@ function findDateTime(messageContent: string): FindResult | null {
   let dateMatch = null;
   switch (format) {
     case "dmy":
-      dateMatch = /([0-2]?[0-9]|3[0-1])[\.\\\-\_](1[0-2]|0?[0-9])[\.\\\-\_](\d+)\b\s*/.exec(
+      dateMatch = /([0-2]?[0-9]|3[0-1])[/\.\\\-\_](1[0-2]|0?[0-9])[/\.\\\-\_](\d+)\b\s*/.exec(
         messageContent,
       );
       if (dateMatch) {
@@ -49,7 +49,7 @@ function findDateTime(messageContent: string): FindResult | null {
       }
       break;
     case "mdy":
-      dateMatch = /(1[0-2]|0?[0-9])[\.\\\-\_]([0-2]?[0-9]|3[0-1])[\.\\\-\_](\d+)\b\s*/.exec(
+      dateMatch = /(1[0-2]|0?[0-9])[/\.\\\-\_]([0-2]?[0-9]|3[0-1])[/\.\\\-\_](\d+)\b\s*/.exec(
         messageContent,
       );
       if (dateMatch) {
@@ -63,7 +63,7 @@ function findDateTime(messageContent: string): FindResult | null {
       }
       break;
     case "ymd":
-      dateMatch = /(\d+)[\.\\\-\_](1[0-2]|0?[0-9])[\.\\\-\_]([0-2]?[0-9]|3[0-1])\b\s*/.exec(
+      dateMatch = /(\d+)[/\.\\\-\_](1[0-2]|0?[0-9])[/\.\\\-\_]([0-2]?[0-9]|3[0-1])\b\s*/.exec(
         messageContent,
       );
       if (dateMatch) {
@@ -77,7 +77,7 @@ function findDateTime(messageContent: string): FindResult | null {
       }
       break;
     case "ydm":
-      dateMatch = /(\d+)[\.\\\-\_]([0-2]?[0-9]|3[0-1])[\.\\\-\_](1[0-2]|0?[0-9])\b\s*/.exec(
+      dateMatch = /(\d+)[/\.\\\-\_]([0-2]?[0-9]|3[0-1])[/\.\\\-\_](1[0-2]|0?[0-9])\b\s*/.exec(
         messageContent,
       );
       if (dateMatch) {
