@@ -1,6 +1,6 @@
 {
   "name": "Replugged-Timestamps",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A plugin that replaces hours with actual timestamps in your messages",
   "engines": {
     "node": ">=20.0.0",
