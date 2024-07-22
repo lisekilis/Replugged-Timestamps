@@ -1,145 +1,130 @@
 import { Injector, Logger, common } from "replugged";
 import { cfg } from "./config";
-
+import { dateFindResult, findResult, prefixFindResult, timeFindResult } from "./types";
 export * from "./settings";
 
 const { messages } = common;
 const inject = new Injector();
 const logger = Logger.plugin("Replugged-Timestamps");
 
-interface FindResult {
-  prefix: string | null;
-  date: Date;
-  index: number;
-  length: number;
+function findPrefix(messageContent: string): prefixFindResult | null {
+  const match = /(?<![^\s(])(?<prefix>d|D|t|T|f|F|R)-/.exec(messageContent);
+  if (match)
+    return {
+      prefix: match.groups!.prefix,
+      index: match.index,
+      length: match[0].length,
+    };
+  return null;
 }
-
-function findDateTime(messageContent: string): FindResult | null {
-  let totalLength = 0;
-  const prefixRequired = cfg.get("prefix", true);
-  //const prefixes = /(d-|D-|t-|T-|f-|F-|R-)([/w]{*})?(([0-1][0-9]|2[0-3]):([0-5][0-9])|24:00)/;
-  const prefixes = /(?<!\S)(d|D|t|T|f|F|R)-/;
-  const match = prefixes.exec(messageContent);
-  let prefix,
-    index = null;
-  if (match == null) {
-    if (prefixRequired) return null;
-    prefix = null;
-  } else {
-    prefix = match[2];
-    totalLength += 2;
-    index = match.index;
-    messageContent = messageContent.slice(index + 2);
-  }
-  const format = cfg.get("format", "dmy");
-  let dateMatch = null;
-  switch (format) {
+function getPrefix(messageContent: string): prefixFindResult | null {
+  let prefix = findPrefix(messageContent);
+  if (prefix) return prefix;
+  return {
+    prefix: cfg.get("defaultPrefix", "t"),
+    index: 0,
+    length: 0,
+  };
+}
+function findDate(
+  messageContent: string,
+  dateFormat: string,
+  shortYear: boolean,
+): dateFindResult | null {
+  const year = /(?<year>\d+)/;
+  const month = /(?<month>1[0-2]|0?[0-9])/;
+  const day = /(?<day>[0-2]?[0-9]|3[0-1])/;
+  let dateMatch;
+  switch (dateFormat) {
     case "dmy":
-      dateMatch = /([0-2]?[0-9]|3[0-1])[/\.\\\-\_](1[0-2]|0?[0-9])[/\.\\\-\_](\d+)\b\s*/.exec(
-        messageContent,
-      );
-      if (dateMatch) {
-        dateMatch = {
-          length: dateMatch[0].length,
-          day: dateMatch[1],
-          month: dateMatch[2],
-          year: dateMatch[3],
-          index: dateMatch.index,
-        };
-      }
+      dateMatch = RegExp(`(?<![^\s(])${day}[./-]${month}[./-]${year}\b`).exec(messageContent);
+      break;
+    case "dym":
+      dateMatch = RegExp(`(?<![^\s(])${day}[./-]${year}[./-]${month}\b`).exec(messageContent); // mental illness
       break;
     case "mdy":
-      dateMatch = /(1[0-2]|0?[0-9])[/\.\\\-\_]([0-2]?[0-9]|3[0-1])[/\.\\\-\_](\d+)\b\s*/.exec(
-        messageContent,
-      );
-      if (dateMatch) {
-        dateMatch = {
-          length: dateMatch[0].length,
-          day: dateMatch[2],
-          month: dateMatch[1],
-          year: dateMatch[3],
-          index: dateMatch.index,
-        };
-      }
+      dateMatch = RegExp(`(?<![^\s(])${month}[./-]${day}[./-]${year}\b`).exec(messageContent);
+      break;
+    case "myd":
+      dateMatch = RegExp(`(?<![^\s(])${month}[./-]${year}[./-]${day}\b`).exec(messageContent); // mental illness
       break;
     case "ymd":
-      dateMatch = /(\d+)[/\.\\\-\_](1[0-2]|0?[0-9])[/\.\\\-\_]([0-2]?[0-9]|3[0-1])\b\s*/.exec(
-        messageContent,
-      );
-      if (dateMatch) {
-        dateMatch = {
-          length: dateMatch[0].length,
-          day: dateMatch[3],
-          month: dateMatch[2],
-          year: dateMatch[1],
-          index: dateMatch.index,
-        };
-      }
+      dateMatch = RegExp(`(?<![^\s(])${year}[./-]${month}[./-]${day}\b`).exec(messageContent);
       break;
     case "ydm":
-      dateMatch = /(\d+)[/\.\\\-\_]([0-2]?[0-9]|3[0-1])[/\.\\\-\_](1[0-2]|0?[0-9])\b\s*/.exec(
-        messageContent,
-      );
-      if (dateMatch) {
-        dateMatch = {
-          length: dateMatch[0].length,
-          day: dateMatch[2],
-          month: dateMatch[3],
-          year: dateMatch[1],
-          index: dateMatch.index,
-        };
-      }
+      dateMatch = RegExp(`(?<![^\s(])${year}[./-]${day}[./-]${month}\b`).exec(messageContent);
       break;
     default:
       break;
   }
-  let date = null;
-  if (dateMatch != null) {
-    if (index == null) index = dateMatch.index;
-    else if (dateMatch.index !== 0) dateMatch = null;
+  const now = new Date();
+  if (dateMatch) {
+    if (shortYear && dateMatch.groups?.year.length === 2)
+      dateMatch.groups.year += now.getFullYear() - (now.getFullYear() % 100);
+    return {
+      year: Number(dateMatch.groups!.year),
+      month: Number(dateMatch.groups!.month),
+      day: Number(dateMatch.groups!.day),
+      index: dateMatch.index,
+      length: dateMatch[0].length,
+    };
   }
-
-  if (dateMatch != null) {
-    let year = Number(dateMatch.year);
-    if (dateMatch.year.length === 2 && cfg.get("shortYear", true)) {
-      const currentYear = new Date().getFullYear();
-      year += currentYear - (currentYear % 100);
-    }
-    date = [Number(dateMatch.day), Number(dateMatch.month) - 1, year];
-    messageContent = messageContent.slice(dateMatch.index + dateMatch.length);
-    totalLength += dateMatch.length;
-  }
-  let shortTimeMatch = /(?<!\S)(0?[1-9]|1[0-2]):([0-5]?[0-9])\s*(am|pm)/i.exec(messageContent);
-  let time;
-  if (shortTimeMatch != null) {
-    if (index == null) index = shortTimeMatch.index;
-    else if (shortTimeMatch.index !== 0) shortTimeMatch = null;
-  }
-  if (shortTimeMatch != null) {
-    totalLength += shortTimeMatch[0].length;
-    let hour = Number(shortTimeMatch[2]);
-    if (shortTimeMatch[4].toLowerCase() == "pm") {
-      if (shortTimeMatch[2].toLowerCase() != "12") hour += 12;
-    }
+  return null;
+}
+function findTime(messageContent: string): timeFindResult | null {
+  let shortTimeMatch =
+    /(?<!\S)(?<hour>0?[1-9]|1[0-2]):(?<minute>[0-5]?[0-9])\s*(?<am_pm>am|pm)/i.exec(messageContent);
+  if (shortTimeMatch) {
+    if (shortTimeMatch.groups?.am_pm.toLowerCase() == "pm" && shortTimeMatch.groups.hour != "12")
+      shortTimeMatch.groups.hour = `${Number(shortTimeMatch.groups.hour) + 12}`;
     if (
-      shortTimeMatch[2] == "12" &&
-      shortTimeMatch[3] == "00" &&
-      shortTimeMatch[4].toLowerCase() == "am"
+      shortTimeMatch.groups?.hour == "12" &&
+      shortTimeMatch.groups.minute == "00" &&
+      shortTimeMatch.groups.am_pm.toLowerCase() == "am"
     )
-      hour = 0;
-    time = [hour, Number(shortTimeMatch[2])];
-  } else {
-    let longTimeMatch = /(?<!\S)([0-1]?[0-9]|2[0-3]):([0-5]?[0-9])|24:00/.exec(messageContent);
-    if (longTimeMatch != null) {
-      if (index == null) index = longTimeMatch.index;
-      else if (longTimeMatch.index !== 0) longTimeMatch = null;
-    }
-
-    if (!longTimeMatch) return null;
-    totalLength += longTimeMatch[0].length;
-    if (longTimeMatch[0] == "24:00") time = [24, 0];
-    else time = [Number(longTimeMatch[2]), Number(longTimeMatch[3])];
+      shortTimeMatch.groups.hour = "0";
+    if (
+      shortTimeMatch.groups?.hour == "00" &&
+      shortTimeMatch.groups.minute == "00" &&
+      shortTimeMatch.groups.am_pm.toLowerCase() == "pm"
+    )
+      shortTimeMatch.groups.hour = "24";
+    return {
+      hour: Number(shortTimeMatch.groups!.hour),
+      minute: Number(shortTimeMatch.groups!.minute),
+      second: 0,
+      index: shortTimeMatch.index,
+      length: shortTimeMatch[0].length,
+    };
   }
+  let longTimeMatch = /(?<!\S)(?<hour>[0-1]?[0-9]|2[0-4]):(?<minute>[0-5]?[0-9])/.exec(
+    messageContent,
+  );
+  if (longTimeMatch) {
+    return {
+      hour: Number(longTimeMatch.groups!.hour),
+      minute: Number(longTimeMatch.groups!.minute),
+      second: 0,
+      index: longTimeMatch.index,
+      length: longTimeMatch[0].length,
+    };
+  }
+  return null;
+}
+function findDateTime(messageContent: string): findResult | null {
+  let totalLength = 0;
+  const prefix = getPrefix(messageContent);
+  if (!prefix) return null;
+  const date = findDate(
+    messageContent.slice(prefix.index + prefix.length),
+    cfg.get("format", "dmy"),
+    cfg.get("shortYear", true),
+  );
+  const time = findTime(
+    messageContent.slice(prefix.index + prefix.length + (date ? date.index + date.length : 0)),
+  );
+
+  totalLength += prefix?.index + prefix;
 
   const fullDate = date
     ? new Date(date[2], date[1], date[0], time[0], time[1])

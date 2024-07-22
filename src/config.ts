@@ -2,12 +2,14 @@ import { settings } from "replugged";
 
 interface Settings {
   prefix?: boolean;
+  defaultPrefix?: string;
   format?: string;
   shortYear?: boolean;
 }
 
 const defaultSettings = {
   prefix: true,
+  defaultPrefix: "t",
   format: "dmy",
   shortYear: true,
 } satisfies Partial<Settings>;
