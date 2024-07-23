@@ -2,6 +2,7 @@ import { components, settings, util } from "replugged";
 
 const { Clickable, Category, Divider, Flex, SwitchItem, SelectItem, Text, Tooltip } = components;
 const cfg = await settings.init("dev.lisekilis.RepluggedTimestamps");
+
 // function for making a table
 /*
 export function FormatRow({
@@ -26,6 +27,7 @@ export function FormatRow({
 
 export function Settings(): React.ReactElement {
   const dateFormatProps = util.useSetting(cfg, "format", "dmy");
+  const timestamp = Math.floor(Date.now() / 1000);
   // dateFormatProps.onChange = ((passOn: (value: string) => void, value: string): void => {
   //   if (value === "ydm" || value === "mdy") {
   //     void boom.play();
@@ -54,79 +56,100 @@ export function Settings(): React.ReactElement {
         <table border={1}>
           <tr>
             <td>
-              <Text.H2 markdown>{"t-hh:mm"}</Text.H2>
+              <Text.H2 markdown>{"t-__hh:mm__"}</Text.H2>
             </td>
             <td>
-              <Text.H2 markdown>{"<t:1692525600:t>"}</Text.H2>
-            </td>
-          </tr>
-          <Divider />
-          <tr>
-            <td>
-              <Text.H2 markdown>{"T-hh:mm:ss"}</Text.H2>
-            </td>
-            <td>
-              <Text.H2 markdown>{"<t:1692525600:T>"}</Text.H2>
+              <Text.H2 markdown>{`<t:${timestamp}:t>`}</Text.H2>
             </td>
           </tr>
           <Divider />
           <tr>
             <td>
-              <Text.H2 markdown>{"d-hh:mm"}</Text.H2>
+              <Text.H2 markdown>{"T-__hh:mm__:ss"}</Text.H2>
             </td>
             <td>
-              <Text.H2 markdown>{"<t:1692525600:d>"}</Text.H2>
-            </td>
-          </tr>
-          <Divider />
-          <tr>
-            <td>
-              <Text.H2 markdown>{"D-hh:mm"}</Text.H2>
-            </td>
-            <td>
-              <Text.H2 markdown>{"<t:1692525600:D>"}</Text.H2>
+              <Text.H2 markdown>{`<t:${timestamp}:T>`}</Text.H2>
             </td>
           </tr>
           <Divider />
           <tr>
             <td>
-              <Text.H2 markdown>{"f-hh:mm"}</Text.H2>
+              <Text.H2 markdown>{"d-__hh:mm__"}</Text.H2>
             </td>
             <td>
-              <Text.H2 markdown>{"<t:1692525600:f>"}</Text.H2>
-            </td>
-          </tr>
-          <Divider />
-          <tr>
-            <td>
-              <Text.H2 markdown>{"F-hh:mm"}</Text.H2>
-            </td>
-            <td>
-              <Text.H2 markdown>{"<t:1692525600:F>"}</Text.H2>
+              <Text.H2 markdown>{`<t:${timestamp}:d>`}</Text.H2>
             </td>
           </tr>
           <Divider />
           <tr>
             <td>
-              <Text.H2 markdown>{"R-hh:mm"}</Text.H2>
+              <Text.H2 markdown>{"D-__hh:mm__"}</Text.H2>
             </td>
             <td>
-              <Text.H2 markdown>{"<t:1692525600:R>"}</Text.H2>
+              <Text.H2 markdown>{`<t:${timestamp}:D>`}</Text.H2>
             </td>
           </tr>
           <Divider />
           <tr>
             <td>
-              <Text.H2 markdown>{"F-10.10.2007 4:20"}</Text.H2>
+              <Text.H2 markdown>{"f-__hh:mm__"}</Text.H2>
             </td>
             <td>
-              <Text.H2 markdown>{"<t:1191982800:F>"}</Text.H2>
+              <Text.H2 markdown>{`<t:${timestamp}:f>`}</Text.H2>
+            </td>
+          </tr>
+          <Divider />
+          <tr>
+            <td>
+              <Text.H2 markdown>{"F-__hh:mm__"}</Text.H2>
+            </td>
+            <td>
+              <Text.H2 markdown>{`<t:${timestamp}:F>`}</Text.H2>
+            </td>
+          </tr>
+          <Divider />
+          <tr>
+            <td>
+              <Text.H2 markdown>{"R-__hh:mm__"}</Text.H2>
+            </td>
+            <td>
+              <Text.H2 markdown>{`<t:${timestamp}:R>`}</Text.H2>
+            </td>
+          </tr>
+          <Divider />
+          <tr>
+            <td>
+              <Text.H2 markdown>{`F-${(() => {
+                const date = new Date();
+                switch (cfg.get("format", "dmy")) {
+                  case "dmy":
+                    return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
+                  case "dym":
+                    return `${date.getDate()}/${date.getFullYear()}/${date.getMonth()}`;
+                  case "mdy":
+                    return `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`;
+                  case "myd":
+                    return `${date.getMonth()}/${date.getFullYear()}/${date.getDate()}`;
+                  case "ymd":
+                    return `${date.getFullYear()}/${date.getMonth()}/${date.getDate()}`;
+                  case "ydm":
+                    return `${date.getFullYear()}/${date.getDate()}/${date.getMonth()}`;
+                  default:
+                    break;
+                }
+              })()} __${(() => {
+                const date = new Date();
+                return `${date.getHours()}/${date.getMinutes()}`;
+              })()}__`}</Text.H2>
+            </td>
+            <td>
+              <Text.H2 markdown>{`<t:${timestamp}:F>`}</Text.H2>
             </td>
           </tr>
         </table>
       </Category>
       <Category title="Date Format">
-        <SelectItem //TODO: add a sound for when mdy or ydm is selected
+        <SelectItem
           {...dateFormatProps}
           options={[
             {
@@ -134,8 +157,16 @@ export function Settings(): React.ReactElement {
               value: "dmy",
             },
             {
+              label: "DD/YYYY/MM", // Mental illness
+              value: "dym",
+            },
+            {
               label: "MM/DD/YYYY",
               value: "mdy",
+            },
+            {
+              label: "MM/YYYY/DD", // Mental illness pt.2
+              value: "myd",
             },
             {
               label: "YYYY/MM/DD",
