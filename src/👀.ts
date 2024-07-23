@@ -177,7 +177,7 @@ export function findFullDate(content: string): findResult | null {
     };
   const date = findDate(
     content,
-    cfg.get("format", "dmy"),
+    cfg.get("dateFormat", "dmy"),
     cfg.get("shortYear", true),
     prefix ? prefix.nextIndex : 0,
   );

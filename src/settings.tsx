@@ -3,6 +3,27 @@ import { components, settings, util } from "replugged";
 const { Clickable, Category, Divider, Flex, SwitchItem, SelectItem, Text, Tooltip } = components;
 const cfg = await settings.init("dev.lisekilis.RepluggedTimestamps");
 
+function fullDate(date: Date, dateFormat: string): string {
+  const etad = (() => {
+    switch (dateFormat) {
+      case "dmy":
+        return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
+      case "dym":
+        return `${date.getDate()}/${date.getFullYear()}/${date.getMonth()}`;
+      case "mdy":
+        return `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`;
+      case "myd":
+        return `${date.getMonth()}/${date.getFullYear()}/${date.getDate()}`;
+      case "ymd":
+        return `${date.getFullYear()}/${date.getMonth()}/${date.getDate()}`;
+      case "ydm":
+        return `${date.getFullYear()}/${date.getDate()}/${date.getMonth()}`;
+      default:
+        break;
+    }
+  })();
+  return `${etad} ${date.getHours()}/${date.getMinutes()}`;
+}
 // function for making a table
 /*
 export function FormatRow({
@@ -53,100 +74,31 @@ export function Settings(): React.ReactElement {
     <>
       <SwitchItem {...util.useSetting(cfg, "prefix", true)}>Required Prefix</SwitchItem>
       <Category title="Formatting">
-        <table border={1}>
-          <tr>
-            <td>
-              <Text.H2 markdown>{"t-__hh:mm__"}</Text.H2>
-            </td>
-            <td>
-              <Text.H2 markdown>{`<t:${timestamp}:t>`}</Text.H2>
-            </td>
-          </tr>
-          <Divider />
-          <tr>
-            <td>
-              <Text.H2 markdown>{"T-__hh:mm__:ss"}</Text.H2>
-            </td>
-            <td>
-              <Text.H2 markdown>{`<t:${timestamp}:T>`}</Text.H2>
-            </td>
-          </tr>
-          <Divider />
-          <tr>
-            <td>
-              <Text.H2 markdown>{"d-__hh:mm__"}</Text.H2>
-            </td>
-            <td>
-              <Text.H2 markdown>{`<t:${timestamp}:d>`}</Text.H2>
-            </td>
-          </tr>
-          <Divider />
-          <tr>
-            <td>
-              <Text.H2 markdown>{"D-__hh:mm__"}</Text.H2>
-            </td>
-            <td>
-              <Text.H2 markdown>{`<t:${timestamp}:D>`}</Text.H2>
-            </td>
-          </tr>
-          <Divider />
-          <tr>
-            <td>
-              <Text.H2 markdown>{"f-__hh:mm__"}</Text.H2>
-            </td>
-            <td>
-              <Text.H2 markdown>{`<t:${timestamp}:f>`}</Text.H2>
-            </td>
-          </tr>
-          <Divider />
-          <tr>
-            <td>
-              <Text.H2 markdown>{"F-__hh:mm__"}</Text.H2>
-            </td>
-            <td>
-              <Text.H2 markdown>{`<t:${timestamp}:F>`}</Text.H2>
-            </td>
-          </tr>
-          <Divider />
-          <tr>
-            <td>
-              <Text.H2 markdown>{"R-__hh:mm__"}</Text.H2>
-            </td>
-            <td>
-              <Text.H2 markdown>{`<t:${timestamp}:R>`}</Text.H2>
-            </td>
-          </tr>
-          <Divider />
-          <tr>
-            <td>
-              <Text.H2 markdown>{`F-${(() => {
-                const date = new Date();
-                switch (cfg.get("format", "dmy")) {
-                  case "dmy":
-                    return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
-                  case "dym":
-                    return `${date.getDate()}/${date.getFullYear()}/${date.getMonth()}`;
-                  case "mdy":
-                    return `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`;
-                  case "myd":
-                    return `${date.getMonth()}/${date.getFullYear()}/${date.getDate()}`;
-                  case "ymd":
-                    return `${date.getFullYear()}/${date.getMonth()}/${date.getDate()}`;
-                  case "ydm":
-                    return `${date.getFullYear()}/${date.getDate()}/${date.getMonth()}`;
-                  default:
-                    break;
-                }
-              })()} __${(() => {
-                const date = new Date();
-                return `${date.getHours()}/${date.getMinutes()}`;
-              })()}__`}</Text.H2>
-            </td>
-            <td>
-              <Text.H2 markdown>{`<t:${timestamp}:F>`}</Text.H2>
-            </td>
-          </tr>
-        </table>
+        <div
+          className="owo_formatting"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "max-content max-content",
+            columnGap: "4px",
+            rowGap: "1px",
+          }}>
+          <Text.H2 markdown>{"t-__hh:mm__"}</Text.H2>
+          <Text.H2 markdown>{`<t:${timestamp}:t>`}</Text.H2>
+          <Text.H2 markdown>{"T-__hh:mm__:ss"}</Text.H2>
+          <Text.H2 markdown>{`<t:${timestamp}:T>`}</Text.H2>
+          <Text.H2 markdown>{"d-__hh:mm__"}</Text.H2>
+          <Text.H2 markdown>{`<t:${timestamp}:d>`}</Text.H2>
+          <Text.H2 markdown>{"D-__hh:mm__"}</Text.H2>
+          <Text.H2 markdown>{`<t:${timestamp}:D>`}</Text.H2>
+          <Text.H2 markdown>{"f-__hh:mm__"}</Text.H2>
+          <Text.H2 markdown>{`<t:${timestamp}:f>`}</Text.H2>
+          <Text.H2 markdown>{"F-__hh:mm__"}</Text.H2>
+          <Text.H2 markdown>{`<t:${timestamp}:F>`}</Text.H2>
+          <Text.H2 markdown>{"R-__hh:mm__"}</Text.H2>
+          <Text.H2 markdown>{`<t:${timestamp}:R>`}</Text.H2>
+          <Text.H2 markdown>{`F-${fullDate(new Date(), cfg.get("dateFormat", "dmy"))}`}</Text.H2>
+          <Text.H2 markdown>{`<t:${timestamp}:F>`}</Text.H2>
+        </div>
       </Category>
       <Category title="Date Format">
         <SelectItem
