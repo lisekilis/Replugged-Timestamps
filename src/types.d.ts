@@ -3,35 +3,35 @@ export interface findResult {
   date: Date;
   index: number;
   length: number;
-  endIndex: number;
+  nextIndex: number;
 }
-export interface prefixFindResult {
+export interface findPrefixResult {
   prefix: string;
   index: number;
   length: number;
-  endIndex: number;
+  nextIndex: number;
 }
-export interface textFindResult {
+export interface findTextResult {
   text: string;
   offset: number;
   index: number;
   length: number;
-  endIndex: number;
+  nextIndex: number;
 }
-export interface dateFindResult {
+export interface findDateResult {
   year: number;
   month: number;
   day: number;
   index: number;
   length: number;
-  endIndex: number;
+  nextIndex: number;
 }
-export interface timeFindResult {
+export interface findTimeResult {
   hour: number;
   minute: number;
   second: number;
   ms: number;
   index: number;
   length: number;
-  endIndex: number;
+  nextIndex: number;
 }
