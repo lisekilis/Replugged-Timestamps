@@ -1,7 +1,9 @@
-import { components, settings, util } from "replugged";
+import { components, common, Logger, settings, util } from "replugged";
+import { parse } from "discord-markdown-parser";
 
 const { Clickable, Category, Divider, Flex, SwitchItem, SelectItem, Text, Tooltip } = components;
 const cfg = await settings.init("dev.lisekilis.RepluggedTimestamps");
+const logger = Logger.plugin("Replugged-Timestamps");
 
 function fullDate(date: Date, dateFormat: string): string {
   const etad = (() => {
@@ -47,8 +49,11 @@ export function FormatRow({
 */
 
 export function Settings(): React.ReactElement {
+  const defaultPrefixProps = util.useSetting(cfg, "defaultPrefix", "t");
   const dateFormatProps = util.useSetting(cfg, "format", "dmy");
-  const timestamp = Math.floor(Date.now() / 1000);
+  const now = new Date();
+  const timestamp = Math.floor(now.valueOf() / 1000);
+  logger.log();
   // dateFormatProps.onChange = ((passOn: (value: string) => void, value: string): void => {
   //   if (value === "ydm" || value === "mdy") {
   //     void boom.play();
@@ -72,7 +77,43 @@ export function Settings(): React.ReactElement {
   */
   return (
     <>
-      <SwitchItem {...util.useSetting(cfg, "prefix", true)}>Required Prefix</SwitchItem>
+      <Category title="Prefix">
+        <SwitchItem {...util.useSetting(cfg, "prefix", true)}>Require Prefix</SwitchItem>
+        <SelectItem
+          {...defaultPrefixProps}
+          options={[
+            {
+              label: `t ${(common.parser.parse(`<t:${timestamp}:t>`) as unknown as React.ReactElement[])[0].props.node.formatted}`,
+              value: "t",
+            },
+            {
+              label: `T ${(common.parser.parse(`<t:${timestamp}:T>`) as unknown as React.ReactElement[])[0].props.node.formatted}`,
+              value: "T",
+            },
+            {
+              label: `d ${(common.parser.parse(`<t:${timestamp}:d>`) as unknown as React.ReactElement[])[0].props.node.formatted}`,
+              value: "d",
+            },
+            {
+              label: `D ${(common.parser.parse(`<t:${timestamp}:D>`) as unknown as React.ReactElement[])[0].props.node.formatted}`,
+              value: "D",
+            },
+            {
+              label: `f ${(common.parser.parse(`<t:${timestamp}:f>`) as unknown as React.ReactElement[])[0].props.node.formatted}`,
+              value: "f",
+            },
+            {
+              label: `F ${(common.parser.parse(`<t:${timestamp}:F>`) as unknown as React.ReactElement[])[0].props.node.formatted}`,
+              value: "F",
+            },
+            {
+              label: `R ${(common.parser.parse(`<t:${timestamp}:R>`) as unknown as React.ReactElement[])[0].props.node.formatted}`,
+              value: "R",
+            },
+          ]}>
+          Default prefix (used if no preifx is provided)
+        </SelectItem>
+      </Category>
       <Category title="Formatting">
         <div
           className="owo_formatting"
