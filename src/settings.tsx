@@ -24,7 +24,7 @@ function fullDate(date: Date, dateFormat: string): string {
         break;
     }
   })();
-  return `${etad} ${date.getHours()}/${date.getMinutes()}`;
+  return `${etad} __${date.getHours()}:${date.getMinutes()}__`;
 }
 // function for making a table
 /*
@@ -50,7 +50,7 @@ export function FormatRow({
 
 export function Settings(): React.ReactElement {
   const defaultPrefixProps = util.useSetting(cfg, "defaultPrefix", "t");
-  const dateFormatProps = util.useSetting(cfg, "format", "dmy");
+  const dateFormatProps = util.useSetting(cfg, "dateFormat", "dmy");
   const now = new Date();
   const timestamp = Math.floor(now.valueOf() / 1000);
   logger.log();
@@ -83,63 +83,37 @@ export function Settings(): React.ReactElement {
           {...defaultPrefixProps}
           options={[
             {
-              label: `t ${(common.parser.parse(`<t:${timestamp}:t>`) as unknown as React.ReactElement[])[0].props.node.formatted}`,
+              label: `${(common.parser.parse(`<t:${timestamp}:t>`) as unknown as React.ReactElement[])[0].props.node.formatted} (ｔ-) `,
               value: "t",
+              key: "t",
             },
             {
-              label: `T ${(common.parser.parse(`<t:${timestamp}:T>`) as unknown as React.ReactElement[])[0].props.node.formatted}`,
+              label: `${(common.parser.parse(`<t:${timestamp}:T>`) as unknown as React.ReactElement[])[0].props.node.formatted} (Ｔ-) `,
               value: "T",
             },
             {
-              label: `d ${(common.parser.parse(`<t:${timestamp}:d>`) as unknown as React.ReactElement[])[0].props.node.formatted}`,
+              label: `${(common.parser.parse(`<t:${timestamp}:d>`) as unknown as React.ReactElement[])[0].props.node.formatted} (ｄ-) `,
               value: "d",
             },
             {
-              label: `D ${(common.parser.parse(`<t:${timestamp}:D>`) as unknown as React.ReactElement[])[0].props.node.formatted}`,
+              label: `${(common.parser.parse(`<t:${timestamp}:D>`) as unknown as React.ReactElement[])[0].props.node.formatted} (Ｄ-) `,
               value: "D",
             },
             {
-              label: `f ${(common.parser.parse(`<t:${timestamp}:f>`) as unknown as React.ReactElement[])[0].props.node.formatted}`,
+              label: `${(common.parser.parse(`<t:${timestamp}:f>`) as unknown as React.ReactElement[])[0].props.node.formatted} (ｆ-) `,
               value: "f",
             },
             {
-              label: `F ${(common.parser.parse(`<t:${timestamp}:F>`) as unknown as React.ReactElement[])[0].props.node.formatted}`,
+              label: `${(common.parser.parse(`<t:${timestamp}:F>`) as unknown as React.ReactElement[])[0].props.node.formatted} (Ｆ-) `,
               value: "F",
             },
             {
-              label: `R ${(common.parser.parse(`<t:${timestamp}:R>`) as unknown as React.ReactElement[])[0].props.node.formatted}`,
+              label: `${(common.parser.parse(`<t:${timestamp}:R>`) as unknown as React.ReactElement[])[0].props.node.formatted} (Ｒ-) `,
               value: "R",
             },
           ]}>
           Default prefix (used if no preifx is provided)
         </SelectItem>
-      </Category>
-      <Category title="Formatting">
-        <div
-          className="owo_formatting"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "max-content max-content",
-            columnGap: "4px",
-            rowGap: "1px",
-          }}>
-          <Text.H2 markdown>{"t-__hh:mm__"}</Text.H2>
-          <Text.H2 markdown>{`<t:${timestamp}:t>`}</Text.H2>
-          <Text.H2 markdown>{"T-__hh:mm__:ss"}</Text.H2>
-          <Text.H2 markdown>{`<t:${timestamp}:T>`}</Text.H2>
-          <Text.H2 markdown>{"d-__hh:mm__"}</Text.H2>
-          <Text.H2 markdown>{`<t:${timestamp}:d>`}</Text.H2>
-          <Text.H2 markdown>{"D-__hh:mm__"}</Text.H2>
-          <Text.H2 markdown>{`<t:${timestamp}:D>`}</Text.H2>
-          <Text.H2 markdown>{"f-__hh:mm__"}</Text.H2>
-          <Text.H2 markdown>{`<t:${timestamp}:f>`}</Text.H2>
-          <Text.H2 markdown>{"F-__hh:mm__"}</Text.H2>
-          <Text.H2 markdown>{`<t:${timestamp}:F>`}</Text.H2>
-          <Text.H2 markdown>{"R-__hh:mm__"}</Text.H2>
-          <Text.H2 markdown>{`<t:${timestamp}:R>`}</Text.H2>
-          <Text.H2 markdown>{`F-${fullDate(new Date(), cfg.get("dateFormat", "dmy"))}`}</Text.H2>
-          <Text.H2 markdown>{`<t:${timestamp}:F>`}</Text.H2>
-        </div>
       </Category>
       <Category title="Date Format">
         <SelectItem
@@ -175,6 +149,39 @@ export function Settings(): React.ReactElement {
         <SwitchItem {...util.useSetting(cfg, "shortYear", false)}>
           Use short Year (2 digits)
         </SwitchItem>
+      </Category>
+      <Category
+        title="Timestamp Formats"
+        open
+        onChange={
+          () =>
+            void {} /* this does nothing to prevent the closure of the category TODO: add a rick roll here */
+        }>
+        <div
+          className="owo_formatting" // I do not condone this class nomenclature
+          style={{
+            display: "grid",
+            gridTemplateColumns: "max-content max-content",
+            columnGap: "10px",
+            rowGap: "1px",
+          }}>
+          <Text.H1 markdown>{"Prefix example"}</Text.H1>
+          <Text.H1 markdown>{"Timestamp"}</Text.H1>
+          <Text.H2 markdown>{"t-__hh:mm__"}</Text.H2>
+          <Text.H2 markdown>{`<t:${timestamp}:t>`}</Text.H2>
+          <Text.H2 markdown>{"T-__hh:mm__:ss"}</Text.H2>
+          <Text.H2 markdown>{`<t:${timestamp}:T>`}</Text.H2>
+          <Text.H2 markdown>{"d-__hh:mm__"}</Text.H2>
+          <Text.H2 markdown>{`<t:${timestamp}:d>`}</Text.H2>
+          <Text.H2 markdown>{"D-__hh:mm__"}</Text.H2>
+          <Text.H2 markdown>{`<t:${timestamp}:D>`}</Text.H2>
+          <Text.H2 markdown>{"f-__hh:mm__"}</Text.H2>
+          <Text.H2 markdown>{`<t:${timestamp}:f>`}</Text.H2>
+          <Text.H2 markdown>{`F-${fullDate(new Date(), cfg.get("dateFormat", "dmy"))}`}</Text.H2>
+          <Text.H2 markdown>{`<t:${timestamp}:F>`}</Text.H2>
+          <Text.H2 markdown>{"R-45s"}</Text.H2>
+          <Text.H2 markdown>{`<t:${timestamp + 45}:R>`}</Text.H2>
+        </div>
       </Category>
       <Clickable
         onClick={() =>
