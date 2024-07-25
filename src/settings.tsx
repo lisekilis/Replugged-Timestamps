@@ -1,5 +1,6 @@
 import { components, common, Logger, settings, util } from "replugged";
-import { parse } from "discord-markdown-parser";
+import { TooltipData } from "./types";
+import { useEffect, useState } from "react";
 
 const { Clickable, Category, Divider, Flex, SwitchItem, SelectItem, Text, Tooltip } = components;
 const cfg = await settings.init("dev.lisekilis.RepluggedTimestamps");
@@ -26,7 +27,53 @@ function fullDate(date: Date, dateFormat: string): string {
   })();
   return `${etad} __${date.getHours()}:${date.getMinutes()}__`;
 }
-// function for making a table
+class Tooltipper {
+  private messages: string[] = [
+    "no",
+    "nah",
+    "nope",
+    "nuh uh",
+    "NO",
+    "STOP!",
+    "alright, I'm going to let you close it",
+    "jk",
+    "will you ever stop?",
+    "I'm getting annoyed",
+    "alright I'm going to let you close it in:",
+    "5",
+    "4",
+    "3",
+    "2",
+    "1",
+    "눈_눈",
+  ];
+  private tooltipData: TooltipData = {
+    lastClick: new Date(),
+    index: 0,
+    message: this.messages[0],
+  };
+
+  public getTooltip(): string {
+    const now = new Date();
+    if (
+      now.valueOf() - this.tooltipData.lastClick.valueOf() < 5 &&
+      this.tooltipData.index < this.messages.length
+    ) {
+      if (this.tooltipData.index === this.messages.length - 1) {
+        window.open("https://discord.com/vanityurl/dotcom/steakpants/flour/flower/index11.html");
+        close();
+      }
+      this.tooltipData.lastClick = now;
+      this.tooltipData.index += 1;
+      this.tooltipData.message = this.messages[this.tooltipData.index];
+    } else {
+      this.tooltipData.lastClick = now;
+      this.tooltipData.index = 0;
+      this.tooltipData.message = this.messages[0];
+    }
+    return this.tooltipData.message;
+  }
+}
 /*
 export function FormatRow({
   display,
@@ -54,6 +101,20 @@ export function Settings(): React.ReactElement {
   const now = new Date();
   const timestamp = Math.floor(now.valueOf() / 1000);
   logger.log();
+  const [tooltipState, setTooltipState] = useState(false);
+  const handleTooltipTrigger = () => {
+    setTooltipState(true);
+  };
+  useEffect(() => {
+    if (tooltipState) {
+      const timeoutId = setTimeout(() => {
+        setTooltipState(false);
+      }, 1000); // 1000 milliseconds = 1 second
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [tooltipState]);
+
   // dateFormatProps.onChange = ((passOn: (value: string) => void, value: string): void => {
   //   if (value === "ydm" || value === "mdy") {
   //     void boom.play();
@@ -150,39 +211,39 @@ export function Settings(): React.ReactElement {
           Use short Year (2 digits)
         </SwitchItem>
       </Category>
-      <Category
-        title="Timestamp Formats"
-        open
-        onChange={
-          () =>
-            void {} /* this does nothing to prevent the closure of the category TODO: add a rick roll here */
-        }>
-        <div
-          className="owo_formatting" // I do not condone this class nomenclature
-          style={{
-            display: "grid",
-            gridTemplateColumns: "max-content max-content",
-            columnGap: "10px",
-            rowGap: "1px",
-          }}>
-          <Text.H1 markdown>{"Prefix example"}</Text.H1>
-          <Text.H1 markdown>{"Timestamp"}</Text.H1>
-          <Text.H2 markdown>{"t-__hh:mm__"}</Text.H2>
-          <Text.H2 markdown>{`<t:${timestamp}:t>`}</Text.H2>
-          <Text.H2 markdown>{"T-__hh:mm__:ss"}</Text.H2>
-          <Text.H2 markdown>{`<t:${timestamp}:T>`}</Text.H2>
-          <Text.H2 markdown>{"d-__hh:mm__"}</Text.H2>
-          <Text.H2 markdown>{`<t:${timestamp}:d>`}</Text.H2>
-          <Text.H2 markdown>{"D-__hh:mm__"}</Text.H2>
-          <Text.H2 markdown>{`<t:${timestamp}:D>`}</Text.H2>
-          <Text.H2 markdown>{"f-__hh:mm__"}</Text.H2>
-          <Text.H2 markdown>{`<t:${timestamp}:f>`}</Text.H2>
-          <Text.H2 markdown>{`F-${fullDate(new Date(), cfg.get("dateFormat", "dmy"))}`}</Text.H2>
-          <Text.H2 markdown>{`<t:${timestamp}:F>`}</Text.H2>
-          <Text.H2 markdown>{"R-45s"}</Text.H2>
-          <Text.H2 markdown>{`<t:${timestamp + 45}:R>`}</Text.H2>
-        </div>
-      </Category>
+      <Tooltip
+        text={/* todo: make the tooltipper work here */}
+        forceOpen={tooltipState}
+        shouldShow={tooltipState}>
+        <Category title="Timestamp Formats" open onChange={handleTooltipTrigger}>
+          <div
+            className="owo_formatting" // I do not condone this class nomenclature
+            style={{
+              display: "grid",
+              gridTemplateColumns: "max-content max-content",
+              columnGap: "10px",
+              rowGap: "1px",
+            }}>
+            <Text.H1 markdown>{"Prefix example"}</Text.H1>
+            <Text.H1 markdown>{"Timestamp"}</Text.H1>
+            <Text.H2 markdown>{"t-__hh:mm__"}</Text.H2>
+            <Text.H2 markdown>{`<t:${timestamp}:t>`}</Text.H2>
+            <Text.H2 markdown>{"T-__hh:mm__:ss"}</Text.H2>
+            <Text.H2 markdown>{`<t:${timestamp}:T>`}</Text.H2>
+            <Text.H2 markdown>{"d-__hh:mm__"}</Text.H2>
+            <Text.H2 markdown>{`<t:${timestamp}:d>`}</Text.H2>
+            <Text.H2 markdown>{"D-__hh:mm__"}</Text.H2>
+            <Text.H2 markdown>{`<t:${timestamp}:D>`}</Text.H2>
+            <Text.H2 markdown>{"f-__hh:mm__"}</Text.H2>
+            <Text.H2 markdown>{`<t:${timestamp}:f>`}</Text.H2>
+            <Text.H2 markdown>{`F-${fullDate(new Date(), cfg.get("dateFormat", "dmy"))}`}</Text.H2>
+            <Text.H2 markdown>{`<t:${timestamp}:F>`}</Text.H2>
+            <Text.H2 markdown>{"R-45s"}</Text.H2>
+            <Text.H2 markdown>{`<t:${timestamp + 45}:R>`}</Text.H2>
+          </div>
+        </Category>
+      </Tooltip>
+
       <Clickable
         onClick={() =>
           window.open("https://discord.com/vanityurl/dotcom/steakpants/flour/flower/index11.html")

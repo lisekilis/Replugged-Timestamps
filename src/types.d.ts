@@ -35,3 +35,8 @@ export interface findTimeResult {
   length: number;
   nextIndex: number;
 }
+export interface TooltipData {
+  lastClick: Date;
+  index: number;
+  message: string;
+}
