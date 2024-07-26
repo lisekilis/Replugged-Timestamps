@@ -20,7 +20,7 @@ function replaceTimestamp(content: string): string {
   if (date) {
     if (date.length == 0)
       return `${content.slice(0, date.nextIndex)}${replaceTimestamp(content.slice(date.index, content.length))}`;
-    return `${content[date.index - 1] == "\\" ? `${content.slice(0, date.index - 1)}${content.slice(date.index, date.nextIndex)}${replaceTimestamp(content.slice(date.nextIndex, content.length))}` : `${content.slice(0, date.index)}${getTimestamp(date.date, date.prefix)}${content.slice(date.nextIndex)}`}`;
+    return `${content[date.index - 1] == "\\" ? `${content.slice(0, date.index - 1)}${content.slice(date.index, date.nextIndex)}${replaceTimestamp(content.slice(date.nextIndex, content.length))}` : `${content.slice(0, date.index)}${getTimestamp(date.date, date.prefix)}${replaceTimestamp(content.slice(date.nextIndex))}`}`;
   }
   return content;
 }
