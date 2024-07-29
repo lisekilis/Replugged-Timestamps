@@ -14,7 +14,7 @@ function getTimestamp(date: Date, prefix?: string | null): string {
   return discordTimestamp;
 }
 
-function replaceTimestamp(content: string): string {
+export function replaceTimestamp(content: string): string {
   const date = findFullDate(content);
   // logger.log("DATE", date);
   if (date) {

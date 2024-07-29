@@ -1,6 +1,7 @@
 import { components, common, Logger, settings, util } from "replugged";
 import { TooltipData } from "./types";
 import { useEffect, useState } from "react";
+import { replaceTimestamp } from ".";
 
 const { Clickable, Category, Divider, Flex, SwitchItem, SelectItem, Text, Tooltip } = components;
 const cfg = await settings.init("dev.lisekilis.RepluggedTimestamps");
@@ -54,56 +55,41 @@ class Tooltipper {
   };
 
   public getTooltip(): string {
-    const now = new Date();
     if (
-      now.valueOf() - this.tooltipData.lastClick.valueOf() < 5 &&
+      Date.now() - this.tooltipData.lastClick.valueOf() < 2500 &&
       this.tooltipData.index < this.messages.length
     ) {
       if (this.tooltipData.index === this.messages.length - 1) {
         window.open("https://discord.com/vanityurl/dotcom/steakpants/flour/flower/index11.html");
         close();
       }
-      this.tooltipData.lastClick = now;
+      this.tooltipData.lastClick = new Date();
       this.tooltipData.index += 1;
       this.tooltipData.message = this.messages[this.tooltipData.index];
     } else {
-      this.tooltipData.lastClick = now;
+      this.tooltipData.lastClick = new Date();
       this.tooltipData.index = 0;
       this.tooltipData.message = this.messages[0];
     }
     return this.tooltipData.message;
   }
 }
-/*
-export function FormatRow({
-  display,
-  example,
-}: {
-  display: string;
-  example: string;
-}): React.ReactElement {
-  return (
-    <Flex>
-      <Flex.Child grow={2} shrink={0}>
-        <Text.H2>{display}</Text.H2>
-      </Flex.Child>
-      <Flex.Child grow={3} shrink={0}>
-        <Text.H2 markdown>{example}</Text.H2>
-      </Flex.Child>
-    </Flex>
-  );
-}
-*/
-
+let tooltipper = new Tooltipper();
+// reset the preview values
+cfg.set("previewPrefix", "t");
+cfg.set("previewValue", "now");
+// REACT(ㆆ_ㆆ)
 export function Settings(): React.ReactElement {
-  const defaultPrefixProps = util.useSetting(cfg, "defaultPrefix", "t");
-  const dateFormatProps = util.useSetting(cfg, "dateFormat", "dmy");
+  logger.log(components);
   const now = new Date();
   const timestamp = Math.floor(now.valueOf() / 1000);
   logger.log();
   const [tooltipState, setTooltipState] = useState(false);
+  const [tooltipText, setTooltipText] = useState("");
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   const handleTooltipTrigger = () => {
     setTooltipState(true);
+    setTooltipText(tooltipper.getTooltip());
   };
   useEffect(() => {
     if (tooltipState) {
@@ -114,39 +100,16 @@ export function Settings(): React.ReactElement {
       return () => clearTimeout(timeoutId);
     }
   }, [tooltipState]);
-
-  // dateFormatProps.onChange = ((passOn: (value: string) => void, value: string): void => {
-  //   if (value === "ydm" || value === "mdy") {
-  //     void boom.play();
-  //   }
-  //   passOn(value);
-  // }).bind(null, dateFormatProps.onChange);
-  /*
-    <FormatRow display={"t-hh:mm"} example={"<t:1692525600:t>"} />
-    <Divider />
-    <FormatRow display={"T-hh:mm:s"} example={"<t:1692525600:T>"} />
-    <Divider />
-    <FormatRow display={"d-hh:mm"} example={"<t:1692525600:d>"} />
-    <Divider />
-    <FormatRow display={"D-hh:mm"} example={"<t:1692525600:D>"} />
-    <Divider />
-    <FormatRow display={"f-hh:mm"} example={"<t:1692525600:f>"} />
-    <Divider />
-    <FormatRow display={"F-hh:mm"} example={"<t:1692525600:F>"} />
-    <Divider />
-    <FormatRow display={"R-hh:mm"} example={"<t:1692525600:R>"} />
-  */
   return (
     <>
       <Category title="Prefix">
         <SwitchItem {...util.useSetting(cfg, "prefix", true)}>Require Prefix</SwitchItem>
         <SelectItem
-          {...defaultPrefixProps}
+          {...util.useSetting(cfg, "defaultPrefix", "t")}
           options={[
             {
               label: `${(common.parser.parse(`<t:${timestamp}:t>`) as unknown as React.ReactElement[])[0].props.node.formatted} (ｔ-) `,
               value: "t",
-              key: "t",
             },
             {
               label: `${(common.parser.parse(`<t:${timestamp}:T>`) as unknown as React.ReactElement[])[0].props.node.formatted} (Ｔ-) `,
@@ -178,7 +141,7 @@ export function Settings(): React.ReactElement {
       </Category>
       <Category title="Date Format">
         <SelectItem
-          {...dateFormatProps}
+          {...util.useSetting(cfg, "dateFormat", "dmy")}
           options={[
             {
               label: "DD/MM/YYYY",
@@ -211,12 +174,77 @@ export function Settings(): React.ReactElement {
           Use short Year (2 digits)
         </SwitchItem>
       </Category>
-      <Tooltip
-        text={/* todo: make the tooltipper work here */}
-        forceOpen={tooltipState}
-        shouldShow={tooltipState}>
+      <Tooltip text={tooltipText} forceOpen={tooltipState} shouldShow={tooltipState}>
         <Category title="Timestamp Formats" open onChange={handleTooltipTrigger}>
-          <div
+          {/* this div uses noneexistent settings on Purpouse */}
+          <div>
+            <SelectItem
+              {...util.useSetting(cfg, "previewPrefix", "t")}
+              hideIcon
+              options={[
+                {
+                  label: `t`,
+                  value: "t",
+                },
+                {
+                  label: `T`,
+                  value: "T",
+                },
+                {
+                  label: `d`,
+                  value: "d",
+                },
+                {
+                  label: `D`,
+                  value: "D",
+                },
+                {
+                  label: `f`,
+                  value: "f",
+                },
+                {
+                  label: `F`,
+                  value: "F",
+                },
+                {
+                  label: `R`,
+                  value: "R",
+                },
+              ]}>
+              Prefix
+            </SelectItem>
+            <Text.H2>-</Text.H2>
+            <SelectItem
+              {...util.useSetting(cfg, "previewValue", "now")}
+              hideIcon
+              options={[
+                {
+                  label: "now",
+                  value: "now",
+                },
+                {
+                  label: "1h 15m",
+                  value: "1h 15m",
+                },
+                {
+                  label: "20.08.2023 11:50 pm",
+                  value: "20.08.2023 11:50 pm",
+                },
+                {
+                  label: "4:20",
+                  value: "4:20",
+                },
+              ]}>
+              Time
+            </SelectItem>
+            <Text.H2>{"=>"}</Text.H2>
+            <Text.H2 markdown>
+              {replaceTimestamp(
+                `${cfg.get("previewPrefix", "t")}-${cfg.get("previewValue", "now")}`,
+              )}
+            </Text.H2>
+          </div>
+          {/* <div
             className="owo_formatting" // I do not condone this class nomenclature
             style={{
               display: "grid",
@@ -240,7 +268,7 @@ export function Settings(): React.ReactElement {
             <Text.H2 markdown>{`<t:${timestamp}:F>`}</Text.H2>
             <Text.H2 markdown>{"R-45s"}</Text.H2>
             <Text.H2 markdown>{`<t:${timestamp + 45}:R>`}</Text.H2>
-          </div>
+          </div> */}
         </Category>
       </Tooltip>
 

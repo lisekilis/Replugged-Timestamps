@@ -5,6 +5,8 @@ interface Settings {
   defaultPrefix?: string;
   dateFormat?: string;
   shortYear?: boolean;
+  previewPrefix?: string;
+  previewValue?: string;
 }
 
 const defaultSettings = {
@@ -12,6 +14,8 @@ const defaultSettings = {
   defaultPrefix: "t",
   dateFormat: "dmy",
   shortYear: true,
+  previewPrefix: "t",
+  previewValue: "now",
 } satisfies Partial<Settings>;
 
 export const cfg = await settings.init<Settings, keyof typeof defaultSettings>(

@@ -1,7 +1,7 @@
 {
   "name": "Replugged-Timestamps",
   "version": "3.0.0",
-  "description": "A plugin that replaces hours with actual timestamps in your messages",
+  "description": "A plugin that replaces hours with actual timestamps in your messages. Check the settings for documentation",
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=8.0.0"
@@ -32,7 +32,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-react": "^7.33.2",
     "prettier": "^3.2.2",
-    "replugged": "^4.7.7",
+    "replugged": "^4.8.1",
     "typescript": "^5.3.3"
   }
 }
