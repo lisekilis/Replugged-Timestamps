@@ -90,12 +90,12 @@ function findDate(
     default:
       return null;
   }
-  const match = dateRegex.exec(content.slice(index, content.length));
+  let match = dateRegex.exec(content.slice(index, content.length));
   // logger.log("DateRegex:", { regex: dateRegex, match });
   const now = new Date();
   if (match) {
     if (shortYear && match.groups?.year.length === 2)
-      match.groups.year += now.getFullYear() - (now.getFullYear() % 100);
+      match.groups.year = `${Number(match.groups.year) + now.getFullYear() - (now.getFullYear() % 100)}`;
     return {
       year: Number(match.groups!.year),
       month: Number(match.groups!.month),

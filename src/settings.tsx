@@ -7,26 +7,31 @@ const { Clickable, Category, Divider, Flex, SwitchItem, SelectItem, Text, Toolti
 const cfg = await settings.init("dev.lisekilis.RepluggedTimestamps");
 const logger = Logger.plugin("Replugged-Timestamps");
 
-function fullDate(date: Date, dateFormat: string): string {
+function formatDate(
+  day: number | string,
+  month: number | string,
+  year: number | string,
+  dateFormat: string,
+): string {
   const etad = (() => {
     switch (dateFormat) {
       case "dmy":
-        return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
+        return `${day}/${month}/${year}`;
       case "dym":
-        return `${date.getDate()}/${date.getFullYear()}/${date.getMonth()}`;
+        return `${day}/${year}/${month}`;
       case "mdy":
-        return `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`;
+        return `${month}/${day}/${year}`;
       case "myd":
-        return `${date.getMonth()}/${date.getFullYear()}/${date.getDate()}`;
+        return `${month}/${year}/${day}`;
       case "ymd":
-        return `${date.getFullYear()}/${date.getMonth()}/${date.getDate()}`;
+        return `${year}/${month}/${day}`;
       case "ydm":
-        return `${date.getFullYear()}/${date.getDate()}/${date.getMonth()}`;
+        return `${year}/${day}/${month}`;
       default:
         break;
     }
   })();
-  return `${etad} __${date.getHours()}:${date.getMinutes()}__`;
+  return `${etad}`;
 }
 class Tooltipper {
   private messages: string[] = [
@@ -176,7 +181,6 @@ export function Settings(): React.ReactElement {
       </Category>
       <Tooltip text={tooltipText} forceOpen={tooltipState} shouldShow={tooltipState}>
         <Category title="Timestamp Formats" open onChange={handleTooltipTrigger}>
-          {/* this div uses noneexistent settings on Purpouse */}
           <div>
             <SelectItem
               {...util.useSetting(cfg, "previewPrefix", "t")}
@@ -227,8 +231,8 @@ export function Settings(): React.ReactElement {
                   value: "1h 15m",
                 },
                 {
-                  label: "20.08.2023 11:50 pm",
-                  value: "20.08.2023 11:50 pm",
+                  label: `${formatDate(20, "08", 2023, cfg.get("dateFormat", "dmy"))} 11:50 pm`,
+                  value: `${formatDate(20, "08", 2023, cfg.get("dateFormat", "dmy"))} 11:50 pm`,
                 },
                 {
                   label: "4:20",
