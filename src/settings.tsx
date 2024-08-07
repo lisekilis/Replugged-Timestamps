@@ -181,8 +181,9 @@ export function Settings(): React.ReactElement {
       </Category>
       <Tooltip text={tooltipText} forceOpen={tooltipState} shouldShow={tooltipState}>
         <Category title="Timestamp Formats" open onChange={handleTooltipTrigger}>
-          <div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <SelectItem
+              style={{ marginBottom: "0px" }}
               {...util.useSetting(cfg, "previewPrefix", "t")}
               hideIcon
               options={[
@@ -219,6 +220,7 @@ export function Settings(): React.ReactElement {
             </SelectItem>
             <Text.H2>-</Text.H2>
             <SelectItem
+              style={{ marginBottom: "0px" }}
               {...util.useSetting(cfg, "previewValue", "now")}
               hideIcon
               options={[
@@ -237,6 +239,10 @@ export function Settings(): React.ReactElement {
                 {
                   label: "4:20",
                   value: "4:20",
+                },
+                {
+                  label: "-45s",
+                  value: "-45s",
                 },
               ]}>
               Time

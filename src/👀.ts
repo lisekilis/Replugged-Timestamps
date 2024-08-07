@@ -26,7 +26,7 @@ function findPrefix(content: string, index?: number): findPrefixResult | null {
 function findText(content: string, index?: number): findTextResult | null {
   // logger.log("Text Content: ", content.slice(index, content.length));
   const match =
-    /^(now|(((?<years>-?\d+)yr?))?([, ]?(?<months>-?\d+)mth)?([, ]?(?<weeks>-?\d+)w)?([, ]?(?<days>-?\d+)d)?([, ]?(?<hours>-?\d+)h)?([, ]?(?<minutes>-?\d+)m)?([, ]?(?<seconds>-?\d+)s)?([, ]?(?<ms>-?\d+)ms)?)/i.exec(
+    /^(now|(((?<years>-?\d+)yr?))?([, ]?(?<months>-?\d+)mth)?([, ]?(?<weeks>-?\d+)w)?([, ]?(?<days>-?\d+)d)?([, ]?(?<hours>-?\d+)h)?([, ]?(?<minutes>-?\d+)m)?([, ]?(?<seconds>-?\d+)s)?)/i.exec(
       content.slice(index, content.length),
     ); //Warning! this matches an empty string
   if (match && match[0].toLowerCase() == "now")
@@ -48,8 +48,7 @@ function findText(content: string, index?: number): findTextResult | null {
         Number(match.groups?.days ?? 0) * 86400000 +
         Number(match.groups?.hours ?? 0) * 3600000 +
         Number(match.groups?.minutes ?? 0) * 60000 +
-        Number(match.groups?.seconds ?? 0) * 1000 +
-        Number(match.groups?.ms ?? 0),
+        Number(match.groups?.seconds ?? 0) * 1000,
       index: (index ?? 0) + match.index,
       length: match[0].length,
       nextIndex: (index ?? 0) + match.index + match[0].length,
