@@ -1,11 +1,12 @@
-import { components, common, Logger, settings, util } from "replugged";
+import { common, components, /* Logger,*/ settings, util } from "replugged";
 import { TooltipData } from "./types";
 import { useEffect, useState } from "react";
 import { replaceTimestamp } from ".";
+import "./styles.css";
 
-const { Clickable, Category, Divider, Flex, SwitchItem, SelectItem, Text, Tooltip } = components;
+const { Clickable, Category, SwitchItem, SelectItem, Text, Tooltip } = components;
 const cfg = await settings.init("dev.lisekilis.RepluggedTimestamps");
-const logger = Logger.plugin("Replugged-Timestamps");
+// const logger = Logger.plugin("Replugged-Timestamps");
 
 function formatDate(
   day: number | string,
@@ -85,10 +86,10 @@ cfg.set("previewPrefix", "t");
 cfg.set("previewValue", "now");
 // REACT(ㆆ_ㆆ)
 export function Settings(): React.ReactElement {
-  logger.log(components);
+  //logger.log(components);
   const now = new Date();
   const timestamp = Math.floor(now.valueOf() / 1000);
-  logger.log();
+  //logger.log();
   const [tooltipState, setTooltipState] = useState(false);
   const [tooltipText, setTooltipText] = useState("");
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -181,9 +182,11 @@ export function Settings(): React.ReactElement {
       </Category>
       <Tooltip text={tooltipText} forceOpen={tooltipState} shouldShow={tooltipState}>
         <Category title="Timestamp Formats" open onChange={handleTooltipTrigger}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div
+            className="funky_switch"
+            style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <SelectItem
-              style={{ marginBottom: "0px" }}
+              style={{ marginBottom: "23px" }}
               {...util.useSetting(cfg, "previewPrefix", "t")}
               hideIcon
               options={[
@@ -220,7 +223,7 @@ export function Settings(): React.ReactElement {
             </SelectItem>
             <Text.H2>-</Text.H2>
             <SelectItem
-              style={{ marginBottom: "0px" }}
+              style={{ marginBottom: "23px", flexBasis: "50%" }}
               {...util.useSetting(cfg, "previewValue", "now")}
               hideIcon
               options={[

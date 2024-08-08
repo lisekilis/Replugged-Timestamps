@@ -7,3 +7,6 @@
   margin-top: 1px;
   background-color: var(--background-modifier-accent);
 }
+.funky_switch [class^="divider"] {
+  display: none;
+}
