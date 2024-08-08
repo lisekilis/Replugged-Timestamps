@@ -142,7 +142,7 @@ export function Settings(): React.ReactElement {
               value: "R",
             },
           ]}>
-          Default prefix (used if no preifx is provided)
+          Default prefix (used if no prefix is provided)
         </SelectItem>
       </Category>
       <Category title="Date Format">
