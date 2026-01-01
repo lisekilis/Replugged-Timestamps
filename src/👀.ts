@@ -117,11 +117,7 @@ function findTime(content: string, index?: number): findTimeResult | null {
   if (shortTimeMatch) {
     if (shortTimeMatch.groups?.am_pm.toLowerCase() == "pm" && shortTimeMatch.groups.hour != "12")
       shortTimeMatch.groups.hour = `${Number(shortTimeMatch.groups.hour) + 12}`;
-    if (
-      shortTimeMatch.groups?.hour == "12" &&
-      shortTimeMatch.groups.minute == "00" &&
-      shortTimeMatch.groups.am_pm.toLowerCase() == "am"
-    )
+    if (shortTimeMatch.groups?.hour == "12" && shortTimeMatch.groups.am_pm.toLowerCase() == "am")
       shortTimeMatch.groups.hour = "0";
     if (
       shortTimeMatch.groups?.hour == "00" &&
